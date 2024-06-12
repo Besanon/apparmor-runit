@@ -1,0 +1,31 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2021 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+profile dbus-launch @{bin}/dbus-launch {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  include <abstractions/lxqt>
+  include <abstractions/X-strict>
+  include <abstractions/dbus-session-strict>
+  
+  signal (send) set=(term kill) peer="dbus-daemon",
+    
+  @{bin}/dbus-launch			mr,
+  @{bin}/dbus-daemon			rPUx,
+  
+  owner @{HOME}/.dbus/{,**}		rw,
+  owner @{PROC}/@{pid}/fd/ 		r,
+
+  owner /var/lib/sddm/.dbus/session-bus/b08dfa6083e7567a1921a@{int}fb-0 rwk,
+
+  /dev/tty@{int}			rw,
+  /dev/pts/@{int}			rw,
+
+}
+
