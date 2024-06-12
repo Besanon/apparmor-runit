@@ -1,0 +1,100 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathdraiu} = @{lib}/dracut/dracut-util
+profile dracut-util @{exec_pathdraiu} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/fonts>
+  include <abstractions/nameservice-strict>
+
+  capability dac_read_search,
+  capability mknod,
+  capability sys_admin,
+  capability sys_chroot,
+
+  network unix stream,
+
+  @{exec_pathdraiu} mr,
+
+  @{sh_path}                 rix,
+  @{coreutils_path}          rix,
+  @{bin}/cpio                rix,
+   @{bin}/hardlink            rix,
+  @{bin}/ldd                 rix,
+   @{bin}/strip               rix,
+   @{bin}/udevadm             rPx,
+
+  @{bin}/{depmod,insmod}     rPx,
+  @{bin}/{kmod,lsmod}        rPx,
+  @{bin}/{modinfo,rmmod}     rPx,
+  @{bin}/modprobe            rPx,
+  @{lib}exec/elogind/elogind-uaccess-command  rPx,
+
+  @{lib}/initcpio/busybox    rix,
+  @{lib}/ld-*.so*            rix,
+
+  /etc/fstab r,
+  /etc/initcpio/{,**} r,
+  /etc/locale.conf r,
+  /etc/lvm/lvm.conf r,
+  /etc/dracut.conf r,
+  /etc/dracut.conf.d/{,**} r,
+  /etc/depmod.d/{,**} r, 
+  /etc/modprobe.d/{,*} r,
+  owner /etc/udev/udev.conf r,
+  /etc/os-release r,
+  /etc/vconsole.conf r,
+
+  /usr/share/kbd/{,**} r,
+  /usr/share/terminfo/** r,
+  /usr/lib/dracut/modules.d/ r,
+  /usr/lib/dracut/modules.d/** r,
+  owner @{lib}exec/elogind/elogind-uaccess-command r,
+
+  # Can copy any program to the initframs
+  /{usr/,}{local/,}{s,}bin/ r,
+  @{bin}/* mr,
+  @{bin}/*/ r,
+  @{lib}/ r,
+  @{lib}/systemd/{,**} mr,
+  @{lib}/udev/* mr,
+
+  # Manage /boot
+  / r,
+  /boot/ r,
+  owner /boot/config-* r,
+  /boot/initramfs-*.img* rw,
+  /boot/vmlinuz-* r,
+
+
+  # Temp files
+  owner @{run}/initramfs/{,**} rw,
+  owner @{tmp}/dracut.@{rand6} rw,
+  owner @{tmp}/dracut.@{rand6}/{,**} rwl,
+  owner @{run}/initcpio-tmp/dracut.@{rand6}/{,**} rwl,
+  owner /var/tmp/dracut.@{rand6}/ rw,
+  owner /var/tmp/dracut.@{rand6}/** rwl,
+  owner /var/tmp/dracut.@{rand6}/{,**} rwl,
+
+  @{sys}/class/block/ r,
+  @{sys}/devices/{,**} r,
+  owner @{sys}/module/firmware_class/parameters/path r,
+  owner @{PROC}/@{pid}/mountinfo r,
+  owner @{PROC}/@{pid}/fd/ r,
+  owner @{PROC}/cmdline  r,
+
+  /dev/tty@{int}* rw,
+
+  # Inherit silencer
+  deny @{HOME}/** r,
+  deny network inet stream,
+  deny network inet6 stream,
+
+}
