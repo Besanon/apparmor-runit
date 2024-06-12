@@ -1,1 +1,87 @@
-#
+
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2021 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathgeoc} = @{lib}/geoclue @{lib}/geoclue-2.0/demos/agent
+profile geoclue @{exec_pathgeoc} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/dbus-strict>
+  include <abstractions/nameservice-strict>
+  include <abstractions/p11-kit>
+  include <abstractions/ssl_certs>
+
+  network inet dgram,
+  network inet6 dgram,
+  network inet stream,
+  network inet6 stream,
+  network netlink raw,
+
+  dbus (send,receive) bus=system path=/org/freedesktop/GeoClue2/{Agent,Manager}
+       interface=org.freedesktop.{DBus.Properties,GeoClue2*},
+
+  dbus send bus=system path=/org/freedesktop/DBus
+       interface=org.freedesktop.DBus
+       member={GetConnectionUnixProcessID,GetConnectionUnixUser,ReleaseName,RequestName}
+       peer=(name=org.freedesktop.DBus),
+
+  dbus send bus=system path=/
+       interface=org.freedesktop.Avahi.Server
+       member={GetAPIVersion,GetState,ServiceBrowserNew},
+
+  dbus send bus=system path=/
+       interface=org.freedesktop.DBus.Peer
+       member=Ping,
+
+  dbus send bus=system path=/fi/w[0-9]/wpa_supplicant[0-9]
+       interface=org.freedesktop.DBus.Properties
+       member=GetAll,
+
+  dbus send bus=system path=/org/freedesktop/ModemManager[0-9]
+       interface=org.freedesktop.DBus.ObjectManager
+       member=GetManagedObjects,
+
+  dbus send bus=system path=/org/freedesktop/NetworkManager
+       interface=org.freedesktop.DBus.Properties
+       member={GetAll,PropertiesChanged},
+
+  dbus receive bus=system path=/
+       interface=org.freedesktop.Avahi.Server
+       member=StateChanged,
+
+  dbus receive bus=system path=/Client[0-9]*/ServiceBrowser[0-9]*
+       interface=org.freedesktop.Avahi.ServiceBrowser
+       member={AllForNow,CacheExhausted}
+       peer=(name=:*, label=avahi-daemon),
+
+  dbus receive bus=system path=/org/freedesktop/NetworkManager
+       interface=org.freedesktop.NetworkManager
+       member={CheckPermissions,StateChanged,PropertiesChanged},
+
+  dbus receive bus=system path=/org/freedesktop/NetworkManager
+       interface=org.freedesktop.DBus.Properties
+       member=PropertiesChanged,
+
+  dbus bind bus=system 
+       name=org.freedesktop.GeoClue2,
+
+  @{exec_pathgeoc} mr,
+
+  /usr/share/glib-2.0/schemas/gschemas.compiled r,
+
+  /etc/geoclue/{,**} r,
+
+  /var/lib/nscd/services r,
+  /var/lib/dbus/machine-id r,
+
+  @{run}/systemd/journal/socket rw,
+
+  @{PROC}/@{pids}/cgroup r,
+  @{PROC}/sys/net/ipv{4,6}/conf/all/disable_ipv{4,6} r,
+
+}
