@@ -1,0 +1,197 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{nmp} = @{bin}/nm-applet 
+profile nm-applet @{nmp} flags=(attach_disconnected) {
+  include <abstractions/dconf-write>
+  include <abstractions/dbus-network-manager-strict>
+  include <abstractions/dbus-strict>
+  include <abstractions/dri>
+  include <abstractions/fonts>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/graphics>
+  include <abstractions/lxqt>
+  include <abstractions/qt5>
+  include <abstractions/nameservice-strict>
+  include <abstractions/openssl>
+  include <abstractions/ssl_certs>
+
+  capability audit_write,
+  capability dac_override,
+  capability kill,
+  capability net_admin,
+  capability net_bind_service,
+  capability net_raw,
+  capability setgid,
+  capability setuid,
+  capability sys_chroot,
+  capability sys_module,
+
+  network inet stream,
+  network inet6 stream,
+  network inet dgram,
+  network inet6 dgram,
+  network inet raw,
+  network inet6 raw,
+  network netlink raw,
+  network packet dgram,
+
+  @{nmp} mr,
+  
+  signal (send) set=(term) peer=dnsmasq,
+
+  ptrace (readby) peer=NetworkManager,
+  ptrace (readby) peer=dbus-daemon,
+
+  dbus (send,receive) bus=system path=/org/freedesktop/NetworkManager{,/**}
+       interface=org.freedesktop.{DBus.Properties,DBus.Introspectable,NetworkManager*},
+
+  dbus (send,receive) bus=system path=/org/freedesktop/PolicyKit[0-9]/Authority
+       interface=org.freedesktop.PolicyKit[0-9].Authority
+       member={Changed,CheckAuthorization,CancelCheckAuthorization},
+
+  dbus (send,receive) bus=system path=/org/freedesktop/login[0-9]
+       interface=org.freedesktop.login[0-9].Manager
+       member={SessionRemoved,UserNew,SessionNew,Inhibit,PrepareForShutdown,UserRemoved,PrepareForSleep}
+       peer=(name=:*, label=systemd-logind),
+
+  dbus send bus=system path=/org/freedesktop/DBus
+       interface=org.freedesktop.DBus
+       member={RequestName,GetConnectionUnixUser,GetConnectionUnixProcessID},
+
+  dbus send bus=system path=/org/freedesktop
+       interface=org.freedesktop.DBus.ObjectManager
+       member={InterfacesAdded,InterfacesRemoved}
+       peer=(name=org.freedesktop.DBus), # label="{gnome-shell,...}"
+
+  dbus send bus=system path=/org/freedesktop/nm_dispatcher
+       interface=org.freedesktop.nm_dispatcher
+       member=Action
+       peer=(name=org.freedesktop.nm_dispatcher),
+
+  dbus send bus=system path=/org/freedesktop/ModemManager[0-9]
+       interface=org.freedesktop.DBus.ObjectManager
+       member=GetManagedObjects,
+
+  dbus send bus=system path=/org/freedesktop/resolve[0-9]
+       interface=org.freedesktop.resolve[0-9].Manager
+       member={SetLink*,ResolveHostname},
+       # org.freedesktop.resolve1
+
+  dbus send bus=system path=/org/freedesktop/hostname[0-9]
+       interface=org.freedesktop.DBus.Properties
+       member=GetAll,
+
+  dbus send bus=system path=/org/freedesktop/ModemManager[0-9]
+       interface=org.freedesktop.DBus.ObjectManager
+       member=GetManagedObjects,
+
+  dbus (send receive) bus=system path=/fi/w1/wpa_supplicant1{,/**}
+       interface={fi.w1.wpa_supplicant1.Interface,org.freedesktop.DBus.Properties}
+       member=PropertiesChanged 
+       peer=(name=:*, label=wpa-supplicant),
+
+  dbus receive bus=system path=/org/freedesktop
+       interface=org.freedesktop.DBus.ObjectManager
+       member=GetManagedObjects,
+
+  dbus receive bus=system path=/org/bluez/hci*/**
+       interface=org.freedesktop.DBus.Properties
+       peer=(name=:*),
+
+  dbus bind bus=system 
+       name=org.freedesktop.NetworkManager,
+  
+  /usr/bin/nm-connection-editor		   Px,  
+  @{lib}/gio/modules/libdconfsettings.so   mr,
+  @{lib}/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so mr,
+
+  /etc/udev/udev.conf					r,	# sys-fs/eudev
+
+  @{lib}/gdk-pixbuf-2.0/2.10.0/loaders.cache r,
+  @{lib}/gio/modules/ r,
+  @{lib}/gio/modules/giomodule.cache r,
+  @{lib}/gconv/gconv-modules r,
+  @{lib}/gconv/gconv-modules.d/ r,
+  @{lib}/gconv/gconv-modules.d/gconv-modules-extra.conf r,
+
+  @{sys}/bus/ r,
+  @{sys}/class/ r,
+  @{sys}/class/net/ r,
+  @{sys}/class/net/rfkill/ r,
+  @{sys}/class/rfkill/ r,
+  @{sys}/devices/@{pci_bus}/{,**}               r,
+  @{sys}/devices/@{pci_bus}/**/**/**               r,
+  @{sys}/devices/system/cpu/possible  r,
+  @{sys}/devices/system/cpu/online r,
+
+  @{run}/network/ifstate r,
+  @{run}/NetworkManager/{,**} rw,
+  @{run}/nm-*.pid rw,
+  @{run}/nscd/db* rwl,
+  @{run}/systemd/inhibit/[0-9]*.ref rw,
+  @{run}/systemd/users/@{uid} r,
+  @{run}/udev/data/+pci:* r,
+  @{run}/udev/data/+platform:* r,
+  @{run}/udev/data/+rfkill:* r,
+  @{run}/udev/data/n@{int} r,
+
+  @{sys}/devices/**/uevent r,
+  @{sys}/devices/virtual/net/{,**} r,
+  @{sys}/devices/pci[0-9]*/**/net/*/{,**} r,
+  @{sys}/devices/pci[0-9]*/**/usb[0-9]/**/net/{,**} r,
+
+  owner @{PROC}/@{pid}/cmdline r,
+  owner @{PROC}/@{pid}/fd/ r,
+        @{PROC}/@{pids}/stat r,
+        @{PROC}/1/environ r,
+        @{PROC}/cmdline r,
+        @{PROC}/sys/kernel/osrelease r,
+        @{PROC}/sys/net/** rw,
+  @{user_config_dirs}/.Xauthority  r,
+  /dev/rfkill rw,
+  /dev/dri/ r,
+  /dev/dri/card@{int} rw,
+
+  /usr/share/nm-tray/nm-tray_de.qm r,
+  /usr/share/nm-tray/nm-tray.conf r,
+  /usr/share/glib-2.0/schemas/gschemas.compiled r,
+  /usr/share/icons/** r,
+  /usr/share/icons/**/* r,
+  /usr/share/icons/**/**/* r,
+}
+
+profile nm-applet.nm-connection-editor /usr/bin/nm-connection-editor {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/dbus-network-manager-strict>
+  include <abstractions/dbus-strict>
+  include <abstractions/nameservice-strict>
+  include <abstractions/openssl>
+  include <abstractions/ssl_certs>
+  
+ dbus (send,receive) bus=system path=/org/freedesktop/NetworkManager{,/**}
+       interface=org.freedesktop.{DBus.Properties,DBus.Introspectable,NetworkManager*},
+  
+  # PSEUDO ---------------------------------------------
+  /dev/tty[0-9]*					rw,
+  /dev/pts/[0-9]*					rw,
+  owner /tmp/xauth_@{rand6}  r,
+    
+  # EXECUTABLES ----------------------------------------
+  /usr/bin/nm-connection-editor				mr,
+/usr/share/mime/{,**} r,
+/usr/share/icons/{,**} r,
+/usr/share/pixmaps/{,**} r,
+  
+  # READS/WRITES ---------------------------------------
+  /etc/udev/udev.conf					r,	# sys-fs/eudev
+   /var/lib/dbus/machine-id   r,
+}
