@@ -1,1 +1,146 @@
-#
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2019-2022 Mikhail Morfikov
+# Copyright (C) 2024 Besanon <mm231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathxbps} = @{bin}/xbps-install 
+profile xbps-install @{exec_pathxbps} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/common/apt>
+  include <abstractions/bus-system>
+  include <abstractions/bus/org.freedesktop.login1>
+  include <abstractions/bus/org.freedesktop.PackageKit>
+  include <abstractions/bus/org.freedesktop.PolicyKit1>
+  include <abstractions/consoles>
+  include <abstractions/nameservice-strict>
+  include <abstractions/python>
+  include <abstractions/xbps>
+  include <abstractions/ssl_certs>
+
+  capability chown,
+  capability dac_override,
+  capability dac_read_search,
+  capability mknod,
+  capability fowner,
+  capability fsetid,
+  capability kill,
+  capability net_admin,
+  capability net_bind_service,
+  capability net_raw,
+  capability setgid,
+  capability setuid,
+  capability sys_nice,
+  capability sys_ptrace,
+
+  network inet stream,
+  network inet6 stream,
+  network inet dgram,
+  network inet6 dgram,
+  network inet raw,
+  network inet6 raw,
+  network netlink raw,
+  network packet dgram,
+
+  dbus send bus=system path=/org/freedesktop/DBus/Bus
+       interface=org.freedesktop.DBus
+       member={GetConnectionUnixProcessID,GetConnectionUnixUser}
+       peer=(name=org.freedesktop.DBus, label=dbus-system),
+
+  dbus send bus=system
+       interface=org.freedesktop.DBus.Introspectable
+       member=Introspect
+       peer=(name="{:*,org.freedesktop.DBus}"),
+
+  @{exec_pathxbps} mr,
+  @{lib}exec/xbps-triggers/*  mrix,
+
+  @{bin}/ r,
+
+  @{sh_path}        rix,
+  @{bin}/{,e}grep   rix,
+  @{bin}/echo       rix,
+  @{bin}/gdbus      rix,
+  @{bin}/id         rPx,  
+  @{bin}/ischroot   rix,
+  @{bin}/test       rix,
+  @{bin}/touch      rix,
+  @{bin}/readlink   rix,
+
+  @{bin}/adequate                        rPx,
+  @{bin}/appstreamcli                    rPx,
+  @{bin}/df                              rPx,
+  @{bin}/dmesg                           rPx,
+  @{bin}/etckeeper                       rPx,
+  @{bin}/localepurge                     rPx,
+  @{bin}/ps                              rPx,
+  @{bin}/basename                        rix,
+  @{bin}/env                             rix,
+  @{bin}/groupadd			 rPx,
+  @{bin}/update-desktop-database 	 rPx,
+  @{bin}/systemctl                       rCx ->  systemctl,
+
+  # For editing the sources.list file
+  @{bin}/vim.*           rCx -> editor,
+
+  /usr/share/xml/iso-codes/{,**} r,
+  /usr/share/language-selector/data/pkg_depends r,
+  owner /usr/share/gdb/auto-load@{lib}64/* r,
+  owner /usr/share/metainfo/* rwk,
+
+  /etc/xbps.d/{,**} rwk,
+  /etc/machine-id r,
+  /var/lib/dbus/machine-id r,
+
+  /var/cache/xbps/ rw,
+  /var/cache/xbps/{,**} rw,
+  owner /var/db/xbps/{,**} rwk,
+  /var/crash/{,*.@{uid}.crash} rw,
+
+  # For package building
+  @{user_build_dirs}/** rwkl -> @{user_build_dirs}/**,
+
+        /tmp/ r,
+  owner /usr/share/xbps.d/{,**} rw,
+
+        @{PROC}/@{pids}/cmdline r,
+        @{PROC}/@{pids}/mountinfo r,
+  owner @{PROC}/@{pid}/fd/ r,
+  owner @{PROC}/@{pid}/mounts r,
+
+  /dev/ptmx rw,
+
+  @{run}/systemd/inhibit/[0-9]*.ref rw,
+  owner /tmp/.xbps-script-@{rand6}  rwk,
+
+  /boot/** rwl -> /boot/**,
+  /etc/** rwl -> /etc/**,
+  /opt/** rwl -> /opt/**,
+  /srv/** rwl -> /srv/**,
+  /usr/** rwlk -> /usr/**,
+  /var/** rwlk -> /var/**,
+
+  profile systemctl {
+    include <abstractions/base>
+    include <abstractions/app/systemctl>
+
+    capability net_admin,
+    capability sys_resource,
+
+    signal (send) set=(cont, term) peer=systemd-tty-ask-password-agent,
+
+    @{bin}/systemd-tty-ask-password-agent rPx,
+
+    owner @{run}/systemd/ask-password-block/{,*} rw,
+    owner @{run}/systemd/ask-password/ rw,
+
+    /dev/kmsg w,
+
+  }
+
+}
+
+
