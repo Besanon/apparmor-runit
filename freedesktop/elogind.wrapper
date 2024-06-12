@@ -1,0 +1,76 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Besanon
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathelogw} = /usr/libexec/elogind/elogind.wrapper
+profile elogind.wrapper @{exec_pathelogw} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/bus-system>
+  include <abstractions/bus/org.freedesktop.login1.Session>
+  include <abstractions/bus/org.freedesktop.login1>
+  include <abstractions/common/systemd>
+
+  ptrace (read) peer=login,
+
+  signal (send) set=(cont) peer=@{p_systemd},
+  signal (send) set=(term hup kill) peer=sddm,  
+
+  dbus send bus=system path=/org/freedesktop/resolve1
+       interface=org.freedesktop.resolve1.Manager
+       member={SetLink*,ResolveHostname}
+       peer=(name=org.freedesktop.resolve1, label=systemd-resolved),
+
+  dbus send bus=system path=/org/freedesktop/DBus
+       interface=org.freedesktop.DBus
+       member={GetConnectionUnixUser,GetConnectionUnixProcessID}
+       peer=(name=org.freedesktop.DBus, label=dbus-system),
+
+  @{exec_pathelogw} mr,
+
+  @{bin}/mountpoint 	rix,
+  @{bin}/mkdir		rix,
+  @{bin}/mount		rix,
+  @{lib}exec/elogind/elogind	rPx,
+
+  mount fstype=tmpfs ->  @{run}/user/,
+  umount  @{run}/user/ ,
+
+  @{lib}exec/elogind/system-shutdown/ r,
+
+  owner /var/log/wtmp rwk,
+
+  owner @{sh_path} r,
+
+  owner @{run}/systemd/ rw,
+  owner @{run}/systemd/** rw,
+  owner @{run}/systemd/machines/ rw,
+  owner @{run}/systemd/inaccessible/ rw,
+  owner @{run}/user/@{uid}/ rw,
+  owner @{run}/user/@{uid}/** rw,
+  @{run}/user/@{uid}/ r,
+  @{run}/user/@{uid}/dbus-1/ rw,
+  @{run}/user/@{uid}/dbus-1/** rw, 
+  @{run}/user/@{uid}/pulse/ rw,
+  @{run}/user/@{uid}/pulse/** rw,
+  owner @{sys}/fs/cgroup/elogind/cgroup.procs rw,
+  owner @{sys}/fs/cgroup/memory/** rw,
+  owner @{sys}/fs/cgroup/elogind/ rw,
+  owner @{sys}/fs/cgroup/elogind/** rw,
+  owner @{sys}/fs/cgroup/memory/memory.limit rw,
+  owner @{sys}/devices/virtual/tty/tty0/active rw,
+  owner @{sys}/power/state r,
+  owner @{sys}/bus/ r,
+  owner @{sys}/class/ r,
+  #owner @{sys}/class/** r,
+  owner /dev/input/event@{int}  rw,
+
+  @{PROC}/@{pid}/cgroup  r,
+  @{PROC}/@{pid}/mountinfo 	r,
+
+  owner /dev/shm/ r,
+}
