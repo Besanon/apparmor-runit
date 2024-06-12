@@ -1,1 +1,4 @@
-#
+
+@{torbrowser_installation_dir}=/opt/tor/tor-browser /opt/tormedium/tor-browser
+@{torbrowser_home_dir}=@{torbrowser_installation_dir}/Browser
+
