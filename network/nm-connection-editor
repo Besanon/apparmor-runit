@@ -1,1 +1,77 @@
-#
+
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathnmoc} = @{bin}/nm-connection-editor
+profile nm-connection-editor @{exec_pathnmoc} {
+  include <abstractions/dconf-write>
+  include <abstractions/base>
+  include <abstractions/bus-system>
+  include <abstractions/dbus-network-manager-strict>
+  include <abstractions/dbus-strict>
+  include <abstractions/fonts>
+  include <abstractions/graphics>
+  include <abstractions/freedesktop.org>
+  include <abstractions/bus/org.freedesktop.NetworkManager>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/lxqt>
+  include <abstractions/qt5>
+  include <abstractions/nameservice-strict>
+  include <abstractions/openssl>
+  include <abstractions/ssl_certs>
+
+  network inet stream,
+
+  dbus receive bus=system path=/org/freedesktop/NetworkManager/ActiveConnection/@{int}
+       interface=org.freedesktop.NetworkManager.Connection.Active
+       member=StateChanged
+       peer=(name=:*, label=NetworkManager),
+
+  dbus send bus=system path=/org/freedesktop/NetworkManager/Settings/@{int}
+       interface=org.freedesktop.NetworkManager.Settings.Connection
+       member=GetSettings
+       peer=(name=:*, label=NetworkManager),
+
+  @{exec_pathnmoc} mr,
+
+  /usr/share/sounds/freedesktop/index.theme r,
+  /usr/share/p11-kit/modules/ r,
+  /usr/share/applications/ r,
+  /usr/share/p11-kit/modules/p11-kit-trust.module r,
+
+  /etc/udev/udev.conf r,
+  /etc/pulse/client.conf r,
+  /etc/machine-id r,
+  /etc/fstab r,
+
+  /var/lib/dbus/machine-id r,
+
+  owner @{user_config_dirs}/pulse/cookie r,  
+  owner @{user_config_dirs}/pulse/ rw,
+  owner @{user_config_dirs}/ibus/bus/ r,
+  owner @{user_config_dirs}/user-dirs.dirs r,
+
+  owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch}  rw,
+  owner @{user_cache_dirs}/event-sound-cache.tdb.host.@{multiarch} rw,
+  owner @{user_share_dirs}/recently-used.xbel r,
+
+  owner /tmp/xauth_@{rand6}  rw,
+
+  owner @{run}/user/@{uid}/pulse/ rw,
+
+  @{sys}/devices/@{pci_bus}/0000:00:0@{int}.1/0000:0@{int}:00.0/*   r,
+
+  owner @{PROC}/@{pid}/fd/ r,
+  owner @{PROC}/@{pid}/mountinfo r,
+
+  /dev/dri/card@{int}  rw,
+  /dev/shm/ r,
+
+  include if exists <local/nm-connection-editor>
+}
