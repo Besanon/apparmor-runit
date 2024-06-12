@@ -1,0 +1,79 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+# Profile for system dbus, regardless of the dbus implementation used.
+# It does not specify an attachment path as it would be the same than
+# "dbus-session". It is intended to be used only via "Px ->" or via 
+# systemd drop-in AppArmorProfile= setting.
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathddbu}  = @{bin}/dbus-broker @{bin}/dbus-broker-launch
+@{exec_pathddbu} += @{lib}/dbus-1{,.0}/dbus-daemon-launch-helper
+profile dbus-system flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/bus-system>
+  include <abstractions/nameservice-strict>
+
+  capability audit_write,
+  capability net_admin,
+  capability setgid,
+  capability setuid,
+  capability sys_ptrace,
+  capability sys_resource,
+
+  network netlink raw,
+  network bluetooth stream,
+  network bluetooth seqpacket,
+
+  dbus bus=system,
+
+#  @{exec_pathddbu} mrix,   # Original
+#  @{exec_pathddbu} mr,     # withoutconfinement
+  @{exec_pathddbu} rPUx,
+
+  @{bin}/**                         PUx,
+  @{lib}/**                         PUx,
+  /usr/share/*/**                   PUx,
+
+  /etc/dbus-1/{,**} r,
+  /usr/share/dbus-1/{,**} r,
+  /var/lib/snapd/dbus-1/{,**} r,
+  @{system_share_dirs}/dbus-1/{,**} r,
+
+  /etc/machine-id r,
+  /var/lib/dbus/machine-id r,
+
+  @{desktop_share_dirs}/icc/ r,
+  @{desktop_share_dirs}/icc/edid-@{hex32}.icc r,
+  @{user_share_dirs}/icc/ r,
+  @{user_share_dirs}/icc/edid-@{hex32}.icc r,
+
+  @{run}/systemd/users/@{int} r,
+  @{run}/systemd/sessions/*.ref rw,
+  @{run}/systemd/inhibit/*.ref rw,
+
+  @{sys}/kernel/security/apparmor/.access rw,
+  @{sys}/kernel/security/apparmor/features/dbus/mask r,
+  @{sys}/module/apparmor/parameters/enabled r,
+
+        @{PROC}/@{pid}/attr/apparmor/current r,
+        @{PROC}/@{pid}/cmdline r,
+        @{PROC}/@{pid}/environ r,
+        @{PROC}/@{pid}/mounts r,
+        @{PROC}/cmdline r,
+        @{PROC}/sys/kernel/osrelease r,
+  owner @{PROC}/@{pid}/fd/ r,
+  owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/oom_score_adj rw,
+
+  /dev/dri/card@{int} rw,
+  /dev/input/event@{int} rw,
+
+  include if exists <local/dbus-system>
+}
