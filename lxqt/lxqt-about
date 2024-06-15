@@ -5,7 +5,7 @@
 
 abi <abi/3.0>,
 
-#include <tunables/global>
+include <tunables/global>
 
 @{exec_pathlx1} = @{bin}/lxqt-about
 profile lxqt-about @{exec_pathlx1} {
