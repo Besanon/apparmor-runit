@@ -7,7 +7,7 @@ abi <abi/3.0>,
 
 include <tunables/global>
 
-@{exec_pathxbpsr} = @{bin}/xbps-remove 
+@{exec_pathxbpsr} = @{bin}/xbps-remove
 profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/common/apt>
@@ -46,7 +46,7 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   network packet dgram,
 
   dbus send bus=system path=/org/freedesktop/DBus/Bus
-       interface=org.freedesktop.DBus
+         interface=org.freedesktop.DBus
        member={GetConnectionUnixProcessID,GetConnectionUnixUser}
        peer=(name=org.freedesktop.DBus, label=dbus-system),
 
@@ -60,10 +60,13 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   @{lib}exec/xbps-triggers/gtk-icon-cache   rix,
   @{lib}exec/xbps-triggers/update-desktopdb rix,
   @{lib}exec/xbps-triggers/kernel-hooks     rix,
-  @{lib}exec/dracut/kernel-hook-postrm	    rix,
-  /etc/kernel.d/post-remove/50-grub 	    rix,
-  @{bin}/gtk-update-icon-cache 		    rPx,
-  @{bin}/update-desktop-database	    rPx,
+  @{lib}exec/dracut/kernel-hook-postrm      rix,
+  @{lib}exec/xbps-triggers/system-accounts  rix,
+  @{lib}exec/xbps-triggers/gsettings-schemas rix,
+  /etc/kernel.d/post-remove/50-grub         rix,
+  @{bin}/gtk-update-icon-cache              rPx,
+  @{bin}/update-desktop-database            rPx,
+  @{bin}/glib-compile-schemas               rPx,
 
   @{bin}/ r,
 
@@ -75,9 +78,14 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   @{bin}/rm         rix,
   @{bin}/ischroot   rix,
   @{bin}/test       rix,
+  @{bin}/readlink   rix,
+  @{bin}/getent     rpx,
+  @{bin}/cut        rix,
+  @{bin}/head       rix,
+  @{bin}/usermod    rpx,
   @{bin}/touch      rix,
 
-  @{bin}/grub-mkconfig 			 rPx,
+  @{bin}/grub-mkconfig                   rPx,
   @{bin}/adequate                        rPx,
   @{bin}/appstreamcli                    rPx,
   @{bin}/df                              rPx,
@@ -85,7 +93,7 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   @{bin}/etckeeper                       rPx,
   @{bin}/localepurge                     rPx,
   @{bin}/ps                              rPx,
-  @{bin}/env                             rix,  
+ @{bin}/env                             rix,
   @{bin}/basename                        rix,
   @{bin}/systemctl                       rCx ->  systemctl,
 
@@ -129,7 +137,7 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   /var/** rwlk -> /var/**,
   /usr/** rwk,
 
-  profile systemctl {
+    profile systemctl {
     include <abstractions/base>
     include <abstractions/app/systemctl>
 
@@ -148,4 +156,4 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   }
 
 }
-
+ 
