@@ -1,0 +1,22 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathksc}  = @{lib}/kf{5,6}/kscreen_backend_launcher
+@{exec_pathksc} += @{lib}/@{multiarch}/{,libexec/}kf{5,6}/kscreen_backend_launcher
+profile kscreen_backend_launcher @{exec_pathksc} {
+  include <abstractions/base>
+  include <abstractions/kde-strict>
+  include <abstractions/lxqt>
+
+  @{exec_pathksc} mr,
+
+  /dev/tty r,
+
+  include if exists <local/kscreen_backend_launcher>
+}
