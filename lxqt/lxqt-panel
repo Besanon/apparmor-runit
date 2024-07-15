@@ -80,6 +80,8 @@ profile lxqt-panel @{exec_pathlx24} {
   @{PROC}/@{pid}/net/dev 				r,
   owner @{PROC}/@{pid}/mounts 				r,
 
+  owner /tmp/pulse-@{rand6}@{rand6}/			rw,
+
   /dev/tty                                              rw,
   /dev/tty@{int}                                        rw,
   /dev/pts/[0-9]*                                       rw,
