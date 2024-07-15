@@ -73,7 +73,7 @@ profile falkon @{exec_pathFFal} {
 
   @{exec_pathFFal} 					     mr,
 
- # @{lib}/qt6/libexec/QtWebEngineProcess 		     rix, 
+  @{lib}/qt6/libexec/QtWebEngineProcess 		     rix, 
   @{lib}/qt6/QtWebEngineProcess 		     	     rix, 
   @{bin}/resolvconf                                          rPx,
   @{bin}/dnsmasq                                             rPx,
@@ -90,12 +90,14 @@ profile falkon @{exec_pathFFal} {
   @{lib}/gvfsd-metadata                              rPx,
 
   /usr/lib/qt6/plugins/falkon/*.so  	     	     mr,
+  /usr/share/libfm-qt6/translations/libfm-qt_de.qm   r,
   /usr/share/libfm-qt/translations/libfm-qt_de.qm    r,
   /usr/share/@{name}/{,**} 			     r,
   /usr/share/doc/{,**} 				     rw,
   /usr/share/publicsuffix/public_suffix_list.dafsa   r,
   /usr/share/qt6/** 				     rw,
   /usr/share/thumbnailers/ 			     r,
+  /usr/share/thumbnailers/* 			     r,
   /usr/share/webext/{,**} 			     r,
   /usr/share/hunspell-bdic/ 			     r,
 
