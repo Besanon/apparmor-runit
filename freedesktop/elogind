@@ -138,6 +138,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner @{run}/udev/data/+drm:card@{int}-HDMI-A-@{int} r,
   owner @{run}/udev/data/+drm:card@{int}-VGA-@{int} r,
   @{run}/user/@{uid}/ rw,
+  @{run}/user/@{uid}/gnupg/ r,
   @{run}/user/@{uid}/pulse/ rw,
   @{run}/user/@{uid}/pulse/** rw,
   @{run}/user/@{uid}/dconf/ rw,
@@ -154,7 +155,6 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner @{run}/udev/data/+input:input@{int} r,
   owner @{run}/udev/data/+drm:card@{int}-* r,
   owner @{run}/utmp rwk,
-  @{run}/user/@{uid}/ r,
 
   owner @{sys}/firmware/efi/efivars/OsIndicationsSupported-@{uuid} r,
   owner @{sys}/fs/cgroup/elogind/cgroup.procs rw,
