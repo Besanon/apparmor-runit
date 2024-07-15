@@ -1,0 +1,54 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2018-2022 Mikhail Morfikov
+# Copyright (C) 2022-2024 Alexandre Pujol <alexandre@pujol.io>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathrcapp} = /usr/lib/apparmor/rc.apparmor.functions
+profile rc.apparmor @{exec_pathrcapp} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/freedesktop.org>
+
+  @{exec_pathrcapp} mr,
+
+  @{sh_path}        rix,
+  @{bin}/{,e}grep   rix,
+  @{bin}/{m,g,}awk  rix,
+  @{bin}/basename   rix,
+  @{bin}/cut        rix,
+  @{bin}/file       rix,
+  @{bin}/head       rix,
+  @{bin}/mv         rix,
+  @{bin}/readlink   rix,
+  @{bin}/realpath   rix,
+  @{bin}/sed        rix,
+  @{bin}/tr         rix,
+  @{bin}/uname      rix,
+  @{bin}/aa-status  rPx,
+
+#  @{bin}/gio        rPx,
+#  @{bin}/kbuildsycoca5 rPx,
+#  @{bin}/ktraderclient5 rPUx,
+#  @{bin}/mimetype   rPx,
+#  @{bin}/xprop      rPx,
+
+  owner @{run}/user/@{uid}/ r,
+
+   /etc/apparmor.d     r,
+   /etc/apparmor.d/**  r,
+   /etc/apparmor.d/{,**}  r,
+
+  /dev/dri/card@{int} rw,
+  /dev/tty rw,
+  /dev/pty/@{int} rw,
+
+  #@{bin}/dbus-launch        rCx -> dbus,
+  #@{bin}/dbus-send          rCx -> dbus,
+
+  @{sys}/module/apparmor r,
+  @{sys}/kernel/security r,
+
+}
