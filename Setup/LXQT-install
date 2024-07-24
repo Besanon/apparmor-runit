@@ -1,0 +1,3 @@
+To get the lxqt-desktop running install (plus some useful software):
+
+xbps-install -S nano polkit-elogind  libreoffice lynis thunar-volman thunar-archive-plugin xarchiver fbreader bleachbit htop gparted cupsd cups-pdf xfce4-pulseaudio-plugin xfe gvfs xfce4-screenshooter galculator libpwquality gutenprint backintime backintime-qt python3-distlib python3-distutils-extra deja-dup baobab djview tumbler lximage-qt
