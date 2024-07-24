@@ -1,0 +1,33 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathperl} = @{bin}/perl
+profile perl @{exec_pathperl} {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  include <abstractions/perl>
+
+  deny owner /etc/nssitch.conf	r,
+  deny /root/* rwx,
+  deny /etc/shadow  rwx,
+
+  @{exec_pathperl} mr,
+
+ @{bin}/id    		rPx,
+ @{bin}/ls    		mrix,
+ @{bin}/cat   		mrix,
+ @{bin}/whomami 	rPx,
+
+ owner @{HOME}/		r,
+
+ owner /dev/pts/@{int} rw,
+
+}
+
+# vim:syntax=apparmor
