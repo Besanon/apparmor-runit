@@ -21,8 +21,8 @@ profile djview @{exec_pathdq4} {
   include <abstractions/ibus>
   include <abstractions/nameservice-strict>
   include <abstractions/user-download-strict>
-  include <abstractions/user-read>
-  include <abstractions/user-write>
+  include <abstractions/user-read-strict>
+  include <abstractions/user-write-strict>
 
   deny network inet,
   deny network inet6,
@@ -49,8 +49,7 @@ profile djview @{exec_pathdq4} {
   /usr/share/icu/73.2/icudt73l.dat 		r,
   /usr/share/hwdata/pnp.ids 			r,
   /usr/share/qt5/translations/qt_de.qm 		r,
-
-  owner @{HOME}/.Xdefaults			r,
+  /usr/share/qt/translations/qt_de.qm 		r,
 
   owner @{user_share_dirs}/ 			r,
   owner @{user_share_dirs}/gvfs-metadata/{,*} 	r,
@@ -74,4 +73,7 @@ profile djview @{exec_pathdq4} {
 
   deny @{lib}/ r, # asks when viewing PostScript files
 
+  include if exists <local/djview>
 }
+
+# vim:syntax=apparmor
