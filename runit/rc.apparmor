@@ -30,12 +30,6 @@ profile rc.apparmor @{exec_pathrcapp} flags=(attach_disconnected) {
   @{bin}/uname      rix,
   @{bin}/aa-status  rPx,
 
-#  @{bin}/gio        rPx,
-#  @{bin}/kbuildsycoca5 rPx,
-#  @{bin}/ktraderclient5 rPUx,
-#  @{bin}/mimetype   rPx,
-#  @{bin}/xprop      rPx,
-
   owner @{run}/user/@{uid}/ r,
 
    /etc/apparmor.d     r,
