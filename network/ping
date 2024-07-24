@@ -1,0 +1,28 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2020-2021 Mikhail Morfikov
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathPIng} = /{usr/,}bin/{,iputils-}ping
+profile ping @{exec_pathPIng} {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/nameservice>
+
+  capability net_raw,
+  capability setuid,
+  network inet raw,
+  network inet6 raw,
+
+  @{exec_pathPIng}	 mixr,
+
+  /etc/modules.conf 	 r,
+
+  include if exists <local/bin.ping>
+}
+
+# vim:syntax=apparmor
