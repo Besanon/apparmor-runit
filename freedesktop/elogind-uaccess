@@ -1,6 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
-# Besanon
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/3.0>,
@@ -17,11 +17,8 @@ profile elogind-uaccess @{exec_pathelogU} {
 
   capability dac_override,
   capability fsetid,
-#  capability dac_read_search,
   capability net_bind_service,
   capability mknod,
-
-#  network netlink raw,
 
   ptrace (read) peer=runsvdir,
   ptrace (read) peer=runsv,
@@ -30,7 +27,6 @@ profile elogind-uaccess @{exec_pathelogU} {
   ptrace (read) peer=lxqt-session,
 
   signal (send) set=(cont) peer=@{p_systemd},
-#  signal (send) set=(term hup kill) peer=sddm,  
 
   dbus send bus=system path=/org/freedesktop/resolve1
        interface=org.freedesktop.resolve1.Manager
@@ -45,53 +41,13 @@ profile elogind-uaccess @{exec_pathelogU} {
 
   @{exec_pathelogU} mr,
 
-#  @{bin}/halt rix,
-
-#  @{bin}/elogind-inhibit   rix, 
-#  /usr/libexec/elogind/elogind/elogind.wrapper   rPx, # alt:rix, 
-#  /usr/libexec/elogind/elogind/elogind-cgroups-agent rix,
-#  /usr/libexec/elogind/elogind/uaccess-command   rix, 
-#  /usr/libexec/elogind/elogind/elogind-uaccess-command   rix, 
-
 #mount fstype=tmpfs ->  @{run}/user/@{uid}/,
 #mount fstype=cgroup ->  @{sys}/fs/cgroup/elogind/,
 #umount  @{run}/user/@{uid}/ ,
 #umount  @{sys}/fs/cgroup/elogind/ ,
 
-#  @{etc_ro}/nologin                r,
-#  @{etc_ro}/pam.d/*                r,
-#  @{etc_ro}/securetty              r,
-#  @{etc_ro}/security/*             r,
-#  @{etc_ro}/shadow                 r,
-#  @{etc_ro}/gshadow                r,
-#  @{etc_ro}/passwd                 r,
-#  @{etc_ro}/nsswitch.conf          r,
-#  @{etc_ro}/pwdb.conf              r,
   owner /etc/elogind/logind.conf   r,
-#  owner /etc/runit/reboot 	   rw,
-
-#  /{usr/,}lib{,32,64}/security/pam_filter/*       mr,
-#  /{usr/,}lib{,32,64}/security/pam_*.so      	  mr,
-#  /{usr/,}lib{,32,64}/security/                   r,
-#  /{usr/,}lib/@{multiarch}/security/pam_filter/*  mr,
-#  /{usr/,}lib/@{multiarch}/security/pam_*.so      mr,
-#  /{usr/,}lib/@{multiarch}/security/              r,
-
-  # gssapi
-#  @{etc_ro}/gss/mech               r,
-#  @{etc_ro}/gss/mech.d/            r,
-#  @{etc_ro}/gss/mech.d/*.conf      r,
-
-  # kerberos
-#  include <abstractions/kerberosclient>
-  # SuSE's pwdutils are different:
-#  @{etc_ro}/default/passwd         r,
-#  @{etc_ro}/login.defs             r,
-#  @{etc_ro}/login.defs.d/          r,
-#  @{etc_ro}/login.defs.d/*.defs    r,
-#  owner /etc/elogind/sleep.conf r,
   owner /etc/runit/stopit rw,
-#  /var/yp/binding/*           r,
 
   @{lib}exec/elogind/system-shutdown/ r,
 
@@ -100,22 +56,9 @@ profile elogind-uaccess @{exec_pathelogU} {
   /etc/pkcs11/modules/ r,
   /etc/pkcs11/modules/* r,
 
-#  /usr/lib{,32,64}/pkcs11/*.so mr,
-#  /usr/lib/@{multiarch}/pkcs11/*.so mr,
-
-#  /usr/share/p11-kit/modules/  r,
-#  /usr/share/p11-kit/modules/* r,
-
-  # gnome-keyring pkcs11 module
-#  owner @{run}/user/[0-9]*/keyring*/pkcs11 rw,
-#  owner @{run}/elogind.pid rwk,
-#  owner @{run}/systemd/ rw,
-#  owner @{run}/systemd/** rw,
-#  owner @{run}/systemd rw,
   owner @{run}/systemd/cgroups-agent rw,
   owner @{run}/systemd/inhibit/  rw,
   owner @{run}/systemd/inhibit/**  rw,
-#  owner @{run}/systemd/inhibit/**/**  rw,
   owner @{run}/systemd/seats/ rw,
   owner @{run}/systemd/seats/** rw,
   owner @{run}/systemd/users/ rw,
@@ -125,8 +68,6 @@ profile elogind-uaccess @{exec_pathelogU} {
   owner @{run}/systemd/machines/ rw,
   owner @{run}/systemd/inaccessible/ rw,
   owner @{run}/systemd/inaccessible/** rw,
-#  owner @{run}/systemd/inaccessible/**/** rw,
-#  owner @{run}/udev/tags/** rw,
   owner @{run}/udev/data/* rw,
   owner @{run}/user/@{uid}/ rw,
   owner @{run}/user/@{uid}/** rw,
@@ -139,7 +80,6 @@ profile elogind-uaccess @{exec_pathelogU} {
   owner @{run}/udev/data/+drm:card@{int}-* r,
   owner @{run}/utmp rwk,
   owner @{run}/user/@{uid}/  rw,
-#  owner @{run}/user/@{uid}/**  rwk,
   @{run}/user/@{uid}/ r,
   @{run}/user/@{uid}/dbus-1/ rw,
   @{run}/user/@{uid}/dbus-1/** rw, 
@@ -165,8 +105,6 @@ owner @{PROC}/@{pid}/comm  r,
 #owner @{PROC}/sysvipc/sem r,
 #owner @{PROC}/sysvipc/msg r,
   @{PROC}/@{pid}/stat r,
-#  @{sys}/devices/{,**}               r,
-#  @{sys}/devices/**               r,
 
   owner /var/log/wtmp rwk,
   owner /dev/shm/ r,
