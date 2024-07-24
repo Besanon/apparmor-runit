@@ -10,6 +10,7 @@ include <tunables/global>
 @{exec_pathbao} = @{bin}/baobab
 profile baobab @{exec_pathbao} {
   include <abstractions/base>
+  include <abstractions/dri>
   include <abstractions/gtk>
   include <abstractions/fonts>
   include <abstractions/fontconfig-cache-read>
@@ -28,7 +29,7 @@ profile baobab @{exec_pathbao} {
   # Needed?
   deny capability sys_nice,
 
-  # SpaceFM needs this for killing/terminating processes it initiates.
+  # for killing/terminating processes it initiates.
   signal (send) set=(term, kill),
   signal (read) set=(kill,term) peer=lxqt-session,
 
@@ -97,3 +98,5 @@ profile baobab @{exec_pathbao} {
 
   include if exists <local/baobab>
 }
+
+# vim:syntax=apparmor
