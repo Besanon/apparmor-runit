@@ -1,4 +1,4 @@
-## apparmor.d - Full set of apparmor profiles
+# apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2015-2022 Mikhail Morfikov
 # Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
@@ -73,7 +73,6 @@ profile falkon @{exec_pathFFal} {
 
   @{exec_pathFFal} 					     mr,
 
-  @{lib}/qt6/libexec/QtWebEngineProcess 		     rix, 
   @{lib}/qt6/QtWebEngineProcess 		     	     rix, 
   @{bin}/resolvconf                                          rPx,
   @{bin}/dnsmasq                                             rPx,
@@ -90,14 +89,12 @@ profile falkon @{exec_pathFFal} {
   @{lib}/gvfsd-metadata                              rPx,
 
   /usr/lib/qt6/plugins/falkon/*.so  	     	     mr,
-  /usr/share/libfm-qt6/translations/libfm-qt_de.qm   r,
   /usr/share/libfm-qt/translations/libfm-qt_de.qm    r,
   /usr/share/@{name}/{,**} 			     r,
   /usr/share/doc/{,**} 				     rw,
   /usr/share/publicsuffix/public_suffix_list.dafsa   r,
   /usr/share/qt6/** 				     rw,
   /usr/share/thumbnailers/ 			     r,
-  /usr/share/thumbnailers/* 			     r,
   /usr/share/webext/{,**} 			     r,
   /usr/share/hunspell-bdic/ 			     r,
 
@@ -135,10 +132,12 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/falkonrc.lock rw,
 
   owner @{user_share_dirs}/applications/userapp-falkon-@{rand6}.desktop{,.@{rand6}} rw,
+  owner @{user_share_dirs}/falkon/ rw,
   owner @{user_share_dirs}/falkon/falkonstaterc.lock rwk,
-  owner @{user_share_dirs}/falkon/QtWebEngine/Default/user_prefs.json r,
+  owner @{user_share_dirs}/falkon/QtWebEngine/{,**} rw,
 
   owner @{user_cache_dirs}/ r,
+  owner @{user_cache_dirs}/falkon/ rw,
   owner @{user_cache_dirs}/falkon/** rw,
   owner @{user_cache_dirs}/falkon/qmlcache/** rwkl -> @{user_cache_dirs}/falkon/qmlcache/#@{int}, 
   owner @{user_cache_dirs}/falkon/qtpipelinecache-x86_64-little_endian-lp64/qqpc_opengl.lck rwk,
@@ -211,4 +210,7 @@ profile falkon @{exec_pathFFal} {
   deny owner @{HOME}/.* r,
   deny owner @{user_share_dirs}/gvfs-metadata/{,*} r,
 
+  include if exists <local/falkon>
 }
+
+# vim:syntax=apparmor
