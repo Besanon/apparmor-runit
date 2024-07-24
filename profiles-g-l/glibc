@@ -1,0 +1,120 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2016-2018 Mikhail Kurinnoi
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathldd} = @{bin}/ldd
+profile glibc.ldd @{exec_pathldd} flags=(attach_disconnected) {
+  include <abstractions/base>
+  
+  capability dac_read_search,
+  capability dac_override,
+    
+  @{exec_pathldd}					mr,
+  
+  /bin/{,**/}*						mr,
+  /bin/{,**/}*					    px -> glibc_ldd_root_test_run,
+  /sbin/{,**/}*						mr,
+  /sbin/{,**/}*				        px -> glibc_ldd_root_test_run,
+  /lib{,32,64,exec}/{,**/}*			mr,
+  /lib{,32,64,exec}/{,**/}*			px -> glibc_ldd_root_test_run,
+  /opt/{,**/}*						mr,
+  /opt/{,**/}*					    px -> glibc_ldd_root_test_run,
+  /usr/{,**/}*						mr,
+  /usr/{,**/}*					    px -> glibc_ldd_root_test_run,
+  
+  /etc/ld.so.cache					r,
+  
+  @{PROC}/meminfo					r,
+  
+  /dev/tty							rw,
+  /dev/tty@{int}					rw,
+  /dev/pts/@{int}					rw,
+  
+  deny /apparmor/.null					r,	# flags=(attach_disconnected)
+  deny /var/cache/revdep-rebuild/*errors*		rw,	# app-portage/gentoolkit, gentoolkit.revdep-rebuild.sh
+}
+
+profile glibc_ldd_root_test_run {
+  
+  /bin/{,**/}*						mr,
+  /sbin/{,**/}*						mr,
+  /lib{,32,64,exec}/{,**/}*				mr,
+  /opt/{,**/}*						mr,
+  /usr/{,**/}*						mr,
+  
+  /etc/ld.so.cache					r,
+
+  #owner /var/tmp/**       r,
+  owner /var/tmp/@{int}       rw,
+  owner /var/tmp/@{int}       mr,
+
+  /dev/tty@{int}					rw,
+  /dev/pts/@{int}					rw,
+}
+
+profile glibc.locale /usr/bin/locale flags=(attach_disconnected) {
+  include <abstractions/base>
+
+  /usr/bin/locale					mr,
+  /bin/gzip							Cx,	# app-arch/gzip
+  
+  /usr/share/i18n/charmaps/{,*.gz}	r,
+
+  /dev/tty							rw,
+  /dev/tty@{int}					rw,
+  /dev/pts/@{int}					rw,
+    
+  deny /apparmor/.null					rw,	# flags=(attach_disconnected)
+  
+  profile gzip /bin/gzip {
+    include <abstractions/base>
+
+    /bin/gzip						mr,
+
+    /usr/share/i18n/charmaps/*.gz			r,
+
+    /dev/tty@{int}					rw,
+    /dev/pts/@{int}					rw,
+   }
+}
+
+profile glibc.ldconfig /sbin/ldconfig flags=(attach_disconnected) {
+  include <abstractions/base>
+  
+  capability sys_chroot,
+  
+  /sbin/ldconfig					mr,
+
+  /dev/tty@{int}					rw,
+  /dev/pts/@{int}					rw,
+    
+  /etc/ld.so.cache{,~}				rw,
+  /etc/ld.so.conf					r,
+  /etc/ld.so.conf.d/{,*}				r,
+  /lib{,32,64}/						r,
+  /usr/lib{,32,64}/					r,
+  /usr/local/lib{,32,64}/				r,
+  /var/cache/ldconfig/aux-cache{,~}			rw,
+  
+  deny /apparmor/.null					rw,	# flags=(attach_disconnected)
+  deny @{HOME}/.pyfa/log.txt			w,	# games-util/pyfa
+  deny /usr/share/pyfa/imgs.zip				r,	# games-util/pyfa
+}
+
+profile glibc.getent /usr/bin/getent {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  
+  /usr/bin/getent					mr,
+
+  owner /dev/pts/@{int} rw,
+
+}
+
+# vim:syntax=apparmor
