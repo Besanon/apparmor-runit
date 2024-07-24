@@ -1,4 +1,11 @@
 
+# apparmor.d - Full set of apparmor profiles
+# based on https://gitorious.org/tbb-apparmor/tbb-apparmor/
+# Copyright (C) 2023 Radostan Riedel <raybuntu@googlemail.com>
+# Copyright (c) 2013-2023 Micah Lee <micah@micahflee.com>
+# Copyright (c) 2024 Tor Project
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+
 @{torbrowser_installation_dir}=/opt/tor/tor-browser /opt/tormedium/tor-browser
 @{torbrowser_home_dir}=@{torbrowser_installation_dir}/Browser
 
