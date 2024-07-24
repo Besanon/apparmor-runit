@@ -1,0 +1,80 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2023 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathBleach} = @{bin}/bleachbit
+profile bleachbit @{exec_pathBleach} {
+  include <abstractions/base>
+  include <abstractions/freedesktop.org>
+  include <abstractions/fonts>
+  include <abstractions/gtk>
+  include <abstractions/fontconfig-cache-read> 
+  include <abstractions/python>
+  include <abstractions/fontconfig-cache-write>
+  include <abstractions/gvfs-open>
+  include <abstractions/graphics>
+  include <abstractions/video>
+  include <abstractions/lxqt>
+  include <abstractions/thumbnails-cache-read>
+  include <abstractions/qt5-shader-cache>
+  include <abstractions/X>
+  
+  ptrace (read),
+
+  @{exec_pathBleach}		mr,
+
+  @{bin}/loginctl   		rpx,    
+  @{bin}/journalctl 		rpx,
+  @{bin}/uname 			rpx,
+
+  /etc/ r,
+  /etc/arch-release r,
+  /etc/pulse/client.conf r,
+  /etc/host.conf r,
+  /etc/gai.conf r,
+  /etc/ca-certificates/extracted/tls-ca-bundle.pem r,
+
+  /opt/{,**}  r,
+  /usr/share/ rw,
+  /usr/share/** rw,
+  /usr/share/libdrm/amdgpu.ids r,
+  /usr/share/libfm-qt/translations/libfm-qt_de.qm r,
+
+  /etc/fstab r,
+
+  owner @{HOME}/ r,
+  /@{HOME}/** rwlk -> /@{HOME}/**,
+  /@{HOME}/** rw,
+
+  owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch} 	rwk,
+  owner @{user_config_dirs}/pulse/cookie 				rwk,
+  owner "@{user_config_dirs}/chromium/Default/Web Data"			rwk,
+  owner @{user_config_dirs}/chromium/Default/History 			rwk,
+  owner @{user_config_dirs}/chromium/Default/Favicons 			rwk,
+  owner @{user_config_dirs}/QtProject.conf r,
+
+  @{PROC}/ r,
+  owner @{PROC}/@{pid}/mountinfo r,
+  owner @{PROC}/@{pid}/mounts r,
+
+  owner @{run}/user/@{uid}/pulse/ r,
+
+
+  owner /var/tmp/etilqs* rwk,
+
+  /dev/shm/ r,
+
+  owner /tmp/@{int}  rw,
+  /tmp/falkon-@{rand6}/  rwk,
+
+  /dev/tty			rw,
+
+  include if exists <local/bleachbit>
+}
+
+# vim:syntax=apparmor
