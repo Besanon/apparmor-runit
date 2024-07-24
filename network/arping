@@ -1,0 +1,24 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2016-2018 Mikhail Kurinnoi
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+profile arping @{bin}/arping {
+  include <abstractions/base>
+  
+  capability net_raw,
+  capability setuid,
+  
+  network packet dgram,
+  network netlink raw,
+  network inet dgram,
+  network inet6 dgram,
+  
+  @{bin}/arping						mr,
+
+}
