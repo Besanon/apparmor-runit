@@ -1,0 +1,5 @@
+to get the plasma desktop running install these packages (incluing some useful software)
+
+xbps-install -S  chrony rkhunter clamav polkit-elogind polkit kde5 kwayland qt5-wayland libreoffice firefox bleachbit keepassxc htop gparted gnome-screenshooter galculator gparted cups cups-pdf pcmanfm-qt kdegraphics-thumbnailers evince tumbler konsole ffmpeg pulseaudio ffmpegthumbs alsa-utils pipewire wireplumber FeatherPad go-mtpfs font-awesome claws-mail mpv vlc numlockx
+kooha pdftk djview yt-dlp mpv qpdf libaom audacity
+reboot
