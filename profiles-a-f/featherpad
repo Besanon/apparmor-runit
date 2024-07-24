@@ -1,0 +1,69 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2015-2022 Mikhail Morfikov
+# Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathFea} = @{bin}/featherpad
+profile featherpad @{exec_pathFea} {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/dbus-session>
+  include <abstractions/dbus-accessibility>
+  include <abstractions/fonts>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/freedesktop.org>
+  include <abstractions/fonts>
+  include <abstractions/gtk>
+  include <abstractions/graphics>
+  include <abstractions/gvfs-open>
+  include <abstractions/lxqt>
+  include <abstractions/thumbnails-cache-read>
+  include <abstractions/qt5-shader-cache>
+  include <abstractions/bus-accessibility>
+  include <abstractions/bus-session>
+  include <abstractions/gvfs-open>
+  include <abstractions/user-read-strict>
+  include <abstractions/user-write-strict>
+  include <abstractions/X>
+  
+  @{exec_pathFea}			mr,
+
+  @{bin}/evince-thumbnailer 		rpx,
+
+  /usr/share/thumbnailers/{,**} r,
+  /usr/share/libfm-qt6/translations/libfm-qt_de.qm r,
+  /usr/share/featherpad/translations/featherpad_de.qm r,
+
+  /etc/fstab r,
+
+  owner @{HOME}/.xscreensaver r,
+
+  owner @{user_config_dirs}/#@{int} rw,
+  owner @{user_config_dirs}/QtProject.conf rw,
+  owner @{user_config_dirs}/QtProject.conf.lock rwk,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6} rw,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6}  l -> @{user_config_dirs}/#@{int},
+  owner @{user_config_dirs}/featherpad/ r,
+  owner @{user_config_dirs}/featherpad/* rw,
+ # owner @{user_config_dirs}/featherpad/**  rwkl -> @{user_config_dirs}/featherpad/#@{int},
+
+  owner @{user_share_dirs}/gvfs-metadata/home r,
+
+  owner @{user_cache_dirs}/thumbnails/ rw,
+
+  owner /tmp/#@{int}		r,
+
+  @{PROC}/sys/kernel/random/boot_id  r,
+  owner @{PROC}/@{pid}/mountinfo r,
+  owner @{PROC}/@{pid}/mounts r,
+
+  /dev/tty						rw,
+
+  include if exists <local/featherpad>
+}
+
+# vim:syntax=apparmor
