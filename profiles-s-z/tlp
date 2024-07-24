@@ -1,5 +1,5 @@
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Alex Trimberg <M231009ts@mailfence.com>
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
@@ -11,6 +11,7 @@ include <tunables/global>
 profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/bus-system>
+  include <abstractions/graphics>
   include <abstractions/bus/org.freedesktop.login1>
   include <abstractions/bus/org.freedesktop.PolicyKit1>
   include <abstractions/nameservice-strict>
@@ -25,6 +26,8 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
 
   @{exec_pathTLP} mr,
 
+  @{bin}/systemctl 		rix,
+  @{bin}/logger			rix,
   @{shells_path}		rix,
   @{bin}/cp 			rix,
   @{bin}/chmod 			rix,
@@ -46,6 +49,8 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   @{bin}/udevadm		rix, 
   /usr/share/tlp/tlp-readconfs  rix,
 
+  owner / r,
+
   owner /etc/tlp.d/ r,
   owner /etc/tlp.d/** rw,
   owner /etc/udev/udev.conf r,
@@ -53,6 +58,7 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
 
   owner /usr/share/tlp/** rw,
   owner /usr/share/tlp/func.d/** rw,
+  
   /usr/share/tlp/tlp-readconfs   rw,
 
   /var/lib/power-profiles-daemon/{,**} rw,
@@ -61,11 +67,12 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   owner /usr/share/perl5/core_perl/** r,
 
   @{run}/udev/data/+platform:* r,
-  owner @{run}/tlp/lock_tlp rwk,
   owner @{run}/tlp/* rw,
+  owner @{run}/tlp/lock_tlp  rwk,
   owner @{run}/udev/data/b@{int}:@{int} r,
 
   @{sys}/bus/ r,
+  owner @{sys}/bus/pci/drivers/nouveau/ r,
   @{sys}/bus/platform/devices/ r,
   @{sys}/class/ r,
   @{sys}/class/power_supply/ r,
@@ -104,6 +111,11 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   owner @{PROC}/sys/fs/xfs/xfssyncd_centisecs rw,
   owner @{PROC}/sys/kernel/nmi_watchdog rw,
 
-   /dev/disk/by-id/ r,
-   owner /dev/sda r,
+  /dev/disk/by-id/ r,
+  owner /dev/sda r,
+  /dev/tty rw,
+
+  include if exists <local/tlp>
 }
+
+# vim:syntax=apparmor
