@@ -1,0 +1,30 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2021 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathsleep} = @{bin}/sleep
+profile sleep @{exec_pathsleep} {
+  include <abstractions/base>
+  include <abstractions/bus-system>
+  include <abstractions/nameservice-strict>
+  include <abstractions/systemd-common>
+
+  capability sys_resource,
+
+  signal (receive) set=(term hup)      peer=runsv,
+
+  @{exec_pathsleep} mr,
+
+  /etc/elogind/sleep.conf r,
+  /etc/elogind/sleep.conf.d/{,*} r,
+  /usr/libexec/elogind/system-sleep/{,*} r,
+
+  @{sys}/power/state rw,
+
+  owner /dev/pts/@{int}  rw,
+}
