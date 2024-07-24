@@ -1,0 +1,31 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathmake} = @{bin}/make
+profile make @{exec_pathmake} {
+  include <abstractions/base>
+
+  capability dac_read_search,
+  capability dac_override,
+
+  /usr/bin/cmake Px,
+
+  @{exec_pathmake}   mr,
+
+  owner /** r,
+  owner /**/ r,
+
+  owner /tmp/@{rand8}  rw,
+
+  owner /dev/pts/@{int} rw,
+
+  include if exists <local/make>
+}
+
+# vim:syntax=apparmor
