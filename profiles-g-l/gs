@@ -1,0 +1,50 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+# Profile for GNU parser generator.
+
+include <tunables/global>
+
+@{exec_pathGS} = @{bin}/{gs,gs.bin} 
+profile @{exec_pathGS} {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/nameservice>
+  include <abstractions/X>
+
+  @{exec_pathGS}     mr,
+
+  /usr/bin/hpijs Cx,
+  /usr/bin/dvips mrix,
+  /usr/lib64/ghostscript/** m,
+  /usr/lib64/libgs.so.* m,
+  /usr/lib64/libijs-* m,
+
+   owner /usr/share/ghostscript/10.02.1/Resource/**/**  r, 
+   owner /usr/share/ghostscript/10.02.1/lib/**  	r, 
+   owner /usr/share/ghostscript/10.02.1/iccprofiles/**  r, 
+
+
+  profile /usr/bin/hpijs {
+    include <abstractions/base>
+
+    network inet dgram,
+
+    /etc/cups/cupsd.conf r,
+    /etc/hp/hplip.conf r,
+    /usr/bin/hpijs mr,
+    /usr/share/ghostscript/** r,
+    /usr/share/hplip/** r,
+    /usr/share/snmp/mibs/ r,
+    /usr/share/snmp/mibs/*.txt r,
+    owner /var/spool/cups/tmp/gs_?????? rw,
+  }
+
+ include if exists <local/gs>
+}
+
+# vim:syntax=apparmor
