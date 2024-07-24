@@ -1,0 +1,91 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2017 Kurinnoi
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathxf} = @{bin}/xfburn
+
+@{USERS_DIR_rk}="[^.]**"
+@{USERS_FILE_rk}="[^.]*"
+
+profile xfburn @{exec_pathxf} {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/freedesktop.org>
+  include <abstractions/fonts>
+  include <abstractions/gtk>
+  include <abstractions/graphics>
+  include <abstractions/video>
+  include <abstractions/X>
+  include <abstractions/nameservice>
+  include <abstractions/bus-accessibility>
+  include <abstractions/bus-session>
+  include <abstractions/gvfs-open>
+  
+  network netlink raw,
+  
+  @{bin}/xfburn					mr,
+ 
+  @{lib}/gstreamer-1.0/gst-plugin-scanner 	rix,
+  
+  /usr/share/xfburn/{,**}				r,
+  /usr/libexec/gvfsd-burn				r,	
+  
+  /etc/udev/udev.conf					r,
+  /etc/fstab 						r,
+  /etc/pulse/client.conf				r,
+  
+  / r,
+
+  owner @{HOME}/ r,
+  @{HOME}/ r,
+
+  owner @{user_config_dirs}/xfburn/{,**}			rw,
+  owner @{user_cache_dirs}/gstreamer-1.0/ 			rw,
+  owner @{user_cache_dirs}/gstreamer-1.0/registry.x86_64.bin 	rw,
+  owner @{user_cache_dirs}/gstreamer-1.0/registry.x86_64.bin.*  rw,
+  owner @{user_cache_dirs}/event-sound-cache.tdb.* 		rwk,
+  owner @{user_cache_dirs}/mesa_shader_cache/marker rw,
+  owner @{user_share_dirs}/sddm/xorg-session.log rw,
+
+  owner /tmp/xauth_@{rand6}  				rw,
+  
+  @{sys}/bus/						r,
+  @{sys}/class/					r,
+  @{sys}/class/block/					r,
+  @{sys}/bus/media/devices/ 			r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/ata2/host1/target1:0:0/1:0:0:0/block/sr0/uevent  r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/ata3/host2/target2:0:0/2:0:0:0/block/sda/sda@{int}/uevent r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/usb1/1-3/1-3:*/media0/uevent r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/ata3/host2/target2:0:0/2:0:0:0/block/sda/uevent r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/ata2/host1/target1:0:0/1:0:0:0/{vendor,model,rev} r,
+  @{sys}/devices/@{pci_bus}/0000:00:02.0/{vendor,device,uevent} r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/0000:01:00.0/uevent r, 
+  @{sys}/devices/@{pci_bus}/0000:00:02.0/{revision,config,subsystem_vendor} r,
+  @{sys}/devices/@{pci_bus}/0000:00:*.0/0000:01:00.0/{revision,config,vendor}  r,
+
+
+  @{PROC}/@{pid}/fd/							r,
+  @{PROC}/sys/dev/cdrom/info					r,
+  owner @{PROC}/@{pid}/mountinfo 			r,
+  owner @{PROC}/@{pid}/mounts 				r,
+
+  /run/udev/data/[a-z]*[0-9]*:[0-9]*			r,
+  owner /run/user/@{uid}/gvfs-burn/			    rw,	
+  owner @{run}/user/@{uid}/pulse/ 			r,
+  owner @{user_config_dirs}/pulse/cookie 		rwk,
+
+  /dev/ r,
+  /dev/shm/ r,
+  /dev/media@{int}  r,
+  /dev/sr@{int}  rwk,
+
+  include if exists <local/xfburn>
+}
+
+# vim:syntax=apparmor
