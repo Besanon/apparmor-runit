@@ -1,0 +1,52 @@
+## apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2019-2021 Mikhail Morfikov
+# Copyright (C) 2023 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathxfss} = @{bin}/xfs_spaceman
+profile xfs_spaceman @{exec_pathxfss} {
+  include <abstractions/base>
+  include <abstractions/disks-write>
+  include <abstractions/user-download-strict>
+
+  capability sys_admin,
+  capability fowner,
+  capability sys_rawio,
+
+  @{exec_pathxfss} mr,
+
+  # A place for file images
+  owner @{user_img_dirs}/{,**} rwk,
+
+  owner @{run}/systemd/fsck.progress rw,
+  
+   @{MOUNTS}/ r,
+   @{MOUNTS}/*/ r,
+   @{HOME}/etc/udev/udev.conf r,
+
+        @{PROC}/partitions r,
+  owner @{PROC}/@{pid}/mounts r,
+
+#  /  r,
+owner /var/ r,
+owner /var/audit/ r,
+owner /var/log/ r,
+owner /opt/  r,
+owner /home/  r,
+owner /tmp/ r,
+
+owner / r,
+owner /boot/ r,
+owner /boot/efi/ r,
+
+owner @{lib}/gconv/gconv-modules.d/{,**} r,
+
+  include if exists <local/xfs_spaceman>
+}
+
+# vim:syntax=apparmor
