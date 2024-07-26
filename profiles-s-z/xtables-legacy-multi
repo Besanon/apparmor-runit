@@ -21,10 +21,10 @@ profile xtables-legacy-multi @{exec_pathtz37} {
   capability setpcap,
 
   network inet raw,
-#  network inet6 raw,
+  network inet6 raw,
   network netlink raw,
   network inet dgram,
-#  network inet6 dgram,
+  network inet6 dgram,
   network packet dgram,
 
   dbus receive bus=system path=/org/fedoraproject/FirewallD1
@@ -53,8 +53,8 @@ profile xtables-legacy-multi @{exec_pathtz37} {
   @{bin}/false                    rix,
   @{bin}/ipset                    rix,
   @{bin}/kmod                     rPx,
-  @{bin}/ipables		  rPx,
-  @{bin}/xtables-nft-multi        rix,
+  @{bin}/iptables	             	  rPx,
+  @{bin}/xtables-nft-multi        rPx,
 
   /usr/local/lib/python3.10/dist-packages/ r,
 
