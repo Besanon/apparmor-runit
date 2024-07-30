@@ -1,0 +1,51 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+/etc/cron.daily/logrotate {
+  include <abstractions/base>
+  include <abstractions/bash-strict>
+  include <abstractions/nameservice>
+
+  /etc/init.d/* mixr,
+
+
+  /{usr/,}bin/bash mixr,
+  /{usr/,}bin/cat mixr,
+  /{usr/,}bin/gzip mixr,
+  /{usr/,}bin/kill mixr,
+  /{usr/,}bin/logger mixr,
+  /{usr/,}bin/true mixr,
+  /usr/bin/killall mixr,
+  /usr/sbin/logrotate mixr,
+
+  /var/log      r,
+  /var/log/**   wrl,
+
+  /var/lib/privoxy/log/**  rwl,
+  /var/lib64/privoxy/log/**  rwl,
+
+  / r,
+  /dev/tty wr,
+  /etc/cron.daily/logrotate r,
+  /etc/logrotate.conf r,
+  /etc/logrotate.d r,
+  /etc/logrotate.d/* r,
+  /etc/subdomain.d r,
+  @{PROC} r,
+  @{PROC}/@{pid} r,
+  /tmp w,
+  /tmp/file* wl,
+  /tmp/logrot* wlr,
+  /var/lib/logrotate.status wr,
+  /{run,var}/lock/samba r,
+  /{,var/}run/httpd.pid r,
+  /{,var/}run/syslogd.pid r,
+  /var/spool/slrnpull wr,
+  /var/spool/slrnpull/log* wrl,
+}
