@@ -19,6 +19,7 @@ profile xfe @{exec_pathxfe} {
   include <abstractions/thumbnails-cache-read>
   include <abstractions/disks-read>
   include <abstractions/consoles>
+  include <abstractions/trash-strict>
 
   # This should be tightened when the "profile has merged rule with conflicting x modifiers" error
   # will be fixed. (#FIXME#)
