@@ -1,0 +1,60 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2017 Kurinnoi
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+profile @{bin}/grep {
+    include <abstractions/fsaccesssystem>
+    include <abstractions/base>
+    include <abstractions/nameservice-strict>
+    
+    ptrace (read) peer=@{p_systemd},
+    
+    # EXECUTABLES --------------------------------------
+    @{bin}/grep						mr,
+    
+    # READS/WRITES -------------------------------------
+    /etc/ld.so.cache					r,
+    /lib{,32,64}/ld{,32,64}-*.so{,.*}			mr,
+    /lib{,32,64}/lib*.so{,.*}				mr,
+    /dev/pts/0 						rw,
+    owner @{PROC}/@{pid}/environ r, 
+    owner @{PROC}/@{pid}/cgroup  r,
+    owner @{PROC}/@{pid}/mounts			r,
+    owner  /dev/tty@{int} 			rw,
+    owner /dev/pts/@{int}			rw,
+  @{sys}/devices/@{pci_bus}/{,**}               r,
+  @{sys}/devices/@{pci_bus}/**/**/**               r,
+
+
+        /         r,
+         /boot/    r,
+         /boot/**  r,
+         /etc/     r,
+         /etc/**   r,
+        /home/    r,
+        /home/**  r,
+        /lost+found/ r,
+        /lost+found/** r,
+        @{MOUNTS}/   r,
+        @{MOUNTS}/** r,
+        /opt/     r,
+        /opt/**   r,
+        /root/    r,
+        /root/**  r,
+        @{run}/   r,
+        @{run}/** r,
+        /srv/     r,
+        /srv/**   r,
+        /tmp/     r,
+        /tmp/**   r,
+        /usr/     r,
+        /usr/**   r,
+        /var/     r,
+        /var/**   r,
+
+  }
