@@ -1,4 +1,4 @@
-# apparmor.d - Full set of apparmor profiles
+## apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2015-2022 Mikhail Morfikov
 # Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
@@ -114,7 +114,32 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/#@{int}  rw,
   owner @{user_config_dirs}/falkon/ r,
   owner @{user_config_dirs}/falkon/* r,
-  owner @{user_config_dirs}/falkon/profiles/** rwkl -> @{user_config_dirs}/falkon/profiles/#@{int},
+
+  owner @{user_config_dirs}/falkon/profiles/ r,
+  owner @{user_config_dirs}/falkon/profiles/#* rw,
+  owner @{user_config_dirs}/falkon/profiles/profiles.ini rw,
+  owner @{user_config_dirs}/falkon/profiles/profiles.ini.lock rwk,
+  owner @{user_config_dirs}/falkon/profiles/profiles.ini.@{rand6} rw,
+  owner @{user_config_dirs}/falkon/profiles/profiles.ini.@{rand6} l -> @{user_config_dirs}/falkon/profiles/#*,
+  owner @{user_config_dirs}/falkon/profiles/default/ r,
+  owner @{user_config_dirs}/falkon/profiles/default/.org.chromium.Chromium.@{rand6} rw,
+  owner @{user_config_dirs}/falkon/profiles/default/browsedata.db rwk,
+  owner @{user_config_dirs}/falkon/profiles/default/browsedata.db-journal rw,
+  owner @{user_config_dirs}/falkon/profiles/default/History-journal rw,
+  owner @{user_config_dirs}/falkon/profiles/default/Favicons rw,
+  owner @{user_config_dirs}/falkon/profiles/default/Favicons-journal rw,
+  owner "@{user_config_dirs}/falkon/profiles/default/Local Storage/level_db/" rw,
+  owner "@{user_config_dirs}/falkon/profiles/default/Network Persistent State" rw,
+  owner @{user_config_dirs}/falkon/profiles/default/settings.ini rw,
+  owner @{user_config_dirs}/falkon/profiles/default/settings.ini.lock rwk,
+  owner @{user_config_dirs}/falkon/profiles/default/#* rw,
+  owner @{user_config_dirs}/falkon/profiles/default/settings.ini.@{rand6} rw, 
+  owner @{user_config_dirs}/falkon/profiles/default/settings.ini.@{rand6} l -> @{user_config_dirs}/falkon/profiles/default/#*,
+  owner @{user_config_dirs}/falkon/profiles/default/session.dat rw,
+  owner @{user_config_dirs}/falkon/profiles/default/session.dat.@{rand6} rw,
+  owner @{user_config_dirs}/falkon/profiles/default/session.dat.@{rand6} l -> @{user_config_dirs}/falkon/profiles/default/#*,
+  owner @{user_config_dirs}/falkon/profiles/default/TransportSecurity rw,
+
   owner @{user_config_dirs}/falkonrc.lock rwk,
   owner @{user_config_dirs}/chromium/WidevineCdm/**   r,
   owner @{user_config_dirs}/chromium/WidevineCdm/4.10.2710.0/_platform_specific/linux_x64/*.so  m,
@@ -124,7 +149,6 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/kdedefaults/* r,
   owner @{user_config_dirs}/kdeglobals r,
   owner @{user_config_dirs}/kdeglobals.lock rwk,
-  owner @{user_config_dirs}/** rwkl  -> @{user_config_dirs}/#@{int}, 
   owner @{user_config_dirs}/kioslaverc r,
   owner @{user_config_dirs}/QtProject.conf rwk,
   owner @{user_config_dirs}/QtProject.conf.lock rwk,
@@ -139,7 +163,7 @@ profile falkon @{exec_pathFFal} {
   owner @{user_cache_dirs}/ r,
   owner @{user_cache_dirs}/falkon/ rw,
   owner @{user_cache_dirs}/falkon/** rw,
-  owner @{user_cache_dirs}/falkon/qmlcache/** rwkl -> @{user_cache_dirs}/falkon/qmlcache/#@{int}, 
+#  owner @{user_cache_dirs}/falkon/qmlcache/** rwkl -> @{user_cache_dirs}/falkon/qmlcache/#@{int}, 
   owner @{user_cache_dirs}/falkon/qtpipelinecache-x86_64-little_endian-lp64/qqpc_opengl.lck rwk,
 
        /tmp/ r,
@@ -183,6 +207,7 @@ profile falkon @{exec_pathFFal} {
   owner @{PROC}/@{pid}/fd/ r,
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/oom_score_adj rw,
   owner @{PROC}/@{pid}/smaps r,
   owner @{PROC}/@{pid}/stat r,
   owner @{PROC}/@{pid}/statm r,
