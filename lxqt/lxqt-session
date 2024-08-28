@@ -17,6 +17,7 @@ profile lxqt-session @{exec_pathlx771} {
   include <abstractions/dconf-write>
   include <abstractions/gtk>
   include <abstractions/graphics>
+  include <abstractions/fontconfig-cache-read>
   include <abstractions/lxqt>
   include <abstractions/video>
   include <abstractions/qt5-shader-cache>
@@ -27,6 +28,7 @@ profile lxqt-session @{exec_pathlx771} {
   include <abstractions/recent-documents-write>
   include <abstractions/ssl_certs>
   include <abstractions/thumbnails-cache-read>
+  include <abstractions/trash-strict>
 
   signal (send),
   signal (receive) set=(kill, term) peer=startlxqt,		
@@ -58,7 +60,9 @@ profile lxqt-session @{exec_pathlx771} {
   @{bin}/dbus-update-activation-environment            rCx -> dbus,
   @{bin}/systemctl                                     rCx -> systemctl,
 
+  @{bin}/system-config-printer-applet   rPx,
   @{bin}/pavucontrol			rPx,	
+  @{bin}/pulseaudio			rPx,	
   @{bin}/python3.@{int}			rPx,
   @{lib}/python3.@{int}			rPx,
   @{bin}/xfe				rPx,
@@ -97,6 +101,7 @@ profile lxqt-session @{exec_pathlx771} {
   owner @{user_config_dirs}/dconf/user			r,
   owner @{user_config_dirs}/openbox/rc.xml      	r,
   owner @{user_share_dirs}/sddm/xorg-session.log 	rw,
+  owner @{user_cache_dirs}/openbox/sessions/            rw,
 
   @{PROC}/ 					r, 
   @{PROC}/uptime 				r,
@@ -127,3 +132,4 @@ profile lxqt-session @{exec_pathlx771} {
 
 }
 
+# vim:syntax=apparmor
