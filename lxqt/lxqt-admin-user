@@ -32,3 +32,5 @@ profile lxqt-admin-user @{exec_pathlx3} {
 
   include if exists <local/lxqt-admin-user>
 }
+
+# vim:syntax=apparmor
