@@ -16,6 +16,7 @@ profile lxqt-config-notificationd @{exec_pathlx12} {
   include <abstractions/fontconfig-cache-read>
   include <abstractions/graphics>
   include <abstractions/mesa>
+  include <abstractions/nameservice-strict>
       
   @{exec_pathlx12}			mr,
 
@@ -23,14 +24,16 @@ profile lxqt-config-notificationd @{exec_pathlx12} {
 
   /var/lib/dbus/machine-id 		r,
 
-  owner @{user_config_dirs}/lxqt/ 	r,
-  owner @{user_config_dirs}/lxqt/** rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/notifications.conf.lock  rwk,
+  owner @{user_config_dirs}/lxqt/#* rw,
+  owner @{user_config_dirs}/lxqt/notifications.conf.@{rand6} rw,
+  owner @{user_config_dirs}/lxqt/notifications.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@*,
 
   owner /tmp/#@{int}  			r,
-  
-  @{PROC}/sys/kernel/random/boot_id      r,
-  
+    
   /dev/tty				 rw,
 
   include if exists <local/lxqt-config-notificationd>
 }
+
+# vim:syntax=apparmor
