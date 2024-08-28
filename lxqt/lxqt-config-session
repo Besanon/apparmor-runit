@@ -14,6 +14,7 @@ profile lxqt-config-session @{exec_pathlx16} {
   include <abstractions/graphics>
   include <abstractions/video>
   include <abstractions/lxqt>
+  include <abstractions/nameservice-strict>
   include <abstractions/qt5>
   include <abstractions/qt5-shader-cache>
   include <abstractions/dbus-session-strict>
@@ -33,19 +34,21 @@ profile lxqt-config-session @{exec_pathlx16} {
   /etc/xdg/autostart/** 				r,
   
   owner @{user_config_dirs}/#@{int}    			rw,
+  owner @{user_config_dirs}/autostart/ 			r,
   owner @{user_config_dirs}/QtProject.conf.@{rand6}	rwkl, 
   owner @{user_config_dirs}/QtProject.conf.lock 	rwk,
   owner @{user_config_dirs}/autostart/*.desktop		r,
   owner @{user_config_dirs}/autostart/lxqt-config-monitor-autostart.desktop  r,
-  owner @{user_config_dirs}/lxqt/**  rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/lxqt**  rwkl -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/user-dirs.dirs 		rw,
 
   owner /tmp/@{int}  			r,
 
-  @{PROC}/sys/kernel/random/boot_id  	r,
   owner @{PROC}/@{pid}/mountinfo 	r,
 
   /dev/tty				rw,
 
  include if exists <local/lxqt-config-session>
 }
+
+# vim:syntax=apparmor
