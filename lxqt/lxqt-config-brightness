@@ -25,7 +25,7 @@ profile lxqt-config-brightness @{exec_pathlx7} {
   
   owner @{HOME}/ 			r,
 
-  owner /tmp/{,**}  			r,
+  owner /tmp/@{int}  			r,
 
   @{sys}/class/backlight/  		r,  
   @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/card@{int}-eDP-@{int}/amdgpu_bl@{int}/*  rw,
@@ -35,3 +35,5 @@ profile lxqt-config-brightness @{exec_pathlx7} {
 
   include if exists <local/lxqt-config-brightness>
 }
+
+# vim:syntax=apparmor
