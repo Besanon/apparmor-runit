@@ -22,13 +22,20 @@ profile lxqt-powermanagement @{exec_pathlx266} flags=(attach_disconnected) {
   @{exec_pathlx266}					mr,
 
   @{bin}/xset						rPx,
+  @{bin}/pkexec 					rPx,
+  @{bin}/{,ba,da}sh 					rix,
   
   /etc/udev/udev.conf 					r,
   /etc/fstab 						r,
-
   owner /tmp/@{int}  					r,
 
   @{run}/systemd/inhibit/* 				rw,
+
+  @{sys}/class/backlight/ 				r,
+  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/type r,
+  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/max_brightness r,
+  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/bl_power r,
+  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/actual_brightness r,
 
   owner @{PROC}/@{pid}/mounts                           r,
 
@@ -36,3 +43,5 @@ profile lxqt-powermanagement @{exec_pathlx266} flags=(attach_disconnected) {
 
   include if exists <local/lxqt-powermangement>
 }
+
+# vim:syntax=apparmor
