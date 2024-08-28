@@ -29,3 +29,5 @@ profile lxqt-admin-user-helper @{exec_pathlx4} {
 
   include if exists <local/lxqt-admin-user-helper>
 }
+
+# vim:syntax=apparmor
