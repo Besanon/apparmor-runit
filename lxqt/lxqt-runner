@@ -39,3 +39,5 @@ profile lxqt-runner @{exec_pathlx27} {
 
   include if exists <local/lxqt-runner>
 }
+
+# vim:syntax=apparmor
