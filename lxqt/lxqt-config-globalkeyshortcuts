@@ -18,16 +18,19 @@ profile lxqt-config-globalkeyshortcuts @{exec_pathlx8} {
   include <abstractions/dbus-session-strict>
   include <abstractions/dbus-accessibility-strict>
   include <abstractions/gvfs-open>
-
+  include <abstractions/nameservice-strict>
+  
   @{exec_pathlx8}			mr,
 
-  owner @{user_config_dirs}/lxqt/** rwkl -> @{user_config_dirs}/lxqt/#@{int},
-  
-  owner /tmp/@{int}  			r,
+  owner @{user_config_dirs}/lxqt/lxqt* rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.lock rwk,
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
 
-  @{PROC}/sys/kernel/random/boot_id     r,
+  owner /tmp/@{int}  			r,
 
   /dev/tty				rw,
 
   include if exists <local/lxqt-config-globalkeyshortcuts>
 }
+
+# vim:syntax=apparmor
