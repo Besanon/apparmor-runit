@@ -18,6 +18,7 @@ profile lxqt-notificationd @{exec_pathlx112} {
   include <abstractions/dbus-session>
   include <abstractions/dbus-accessibility>
   include <abstractions/gvfs-open>
+  include <abstractions/nameservice-strict>
 
   dbus receive
   	bus=session
@@ -36,23 +37,21 @@ profile lxqt-notificationd @{exec_pathlx112} {
   	peer=(name=":[0-9]*.[0-9]*"),
   
    @{exec_pathlx112}					mr,
-
-   /etc/nsswitch.conf 					r,
   
    /var/lib/dpkg/info/lxqt-notifications.conffiles 	r,
 
    owner @{user_cache_dirs}/lxqt-notificationd/**  	rwk,
+   owner @{user_cache_dirs}/lxqt-notificationd/		rw,
    owner @{user_cache_dirs}/lxqt-notificationd/#@{int} 	rw,
    owner @{user_cache_dirs}/lxqt-notificationd/unattended.list.@{rand6} rwkl -> @{user_cache_dirs}/lxqt-notificationd/#@{int},
    owner @{user_cache_dirs}/mesa_shader_cache/index 	rwk,
-
    owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.@{rand6} rwkl -> @{user_config_dirs}/lxqt/#@{int},
 
-   owner /tmp/{,**}  					r,
-
-   @{PROC}/sys/kernel/random/boot_id 			r,
+   owner /tmp/@{int}  					r,
 
    /dev/tty						rw,
 
    include if exists <local/lxqt-notificationd>
 }
+
+# vim:syntax=apparmor
