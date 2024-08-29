@@ -7,27 +7,21 @@ abi <abi/3.0>,
 
 include <tunables/global>
 
-@{exec_pathnan} = @{bin}/nano
-profile nano @{exec_pathnan} {
+profile nano @{bin}/nano {
   include <abstractions/base>
+  include <abstractions/nameservice-strict>
   include <abstractions/common/app>
   include <abstractions/thumbnails-cache-read>
-
-  capability dac_override,
-  capability dac_read_search,  
-
-  @{exec_pathnan}		mr,
   
-#  @{sys}/devices/@{pci_bus}/{,**}               r,
-#  @{sys}/devices/@{pci_bus}/**/**/**               r,
+  capability dac_read_search,
+  capability dac_override,
 
-  @{PROC}/sys/kernel/random/boot_id  r,
-
+  @{bin}/nano		mr,
+  
   owner /tmp/@{int}  r,
   /opt/{,**}  r,
 
   /usr/share/libfm-qt/translations/libfm-qt_de.qm r,
-  /usr/share/libdrm/amdgpu.ids r,
   /etc/fstab r,
 
   owner @{PROC}/@{pid}/mountinfo r,
@@ -43,7 +37,7 @@ profile nano @{exec_pathnan} {
         /boot/**  r,
   owner /boot/**  rw,
         /etc/     r,
-        /etc/**   rw,
+        /etc/**   r,
   owner /etc/**   rw,
         /home/    r,
         /home/**  r,
