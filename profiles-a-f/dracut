@@ -1,6 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/3.0>,
@@ -93,7 +93,6 @@ profile dracut @{exec_pathdra} flags=(attach_disconnected) {
   owner @{run}/initcpio-tmp/dracut.@{rand6}/{,**} rwl,
   owner /var/tmp/dracut.@{rand6}/ r,
   owner /var/tmp/dracut.@{rand6}/** rwk,
-#  owner /var/tmp/dracut.@{rand6}/{,**} rwk,
 
   @{sys}/class/block/ r,
   @{sys}/devices/{,**} r,
