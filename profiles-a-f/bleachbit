@@ -1,78 +1,99 @@
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2023 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
-
-abi <abi/3.0>,
 
 include <tunables/global>
 
-@{exec_pathBleach} = @{bin}/bleachbit
-profile bleachbit @{exec_pathBleach} {
+profile bleachbit @{bin}/bleachbit {
   include <abstractions/base>
+  include <abstractions/dri>
   include <abstractions/freedesktop.org>
   include <abstractions/fonts>
   include <abstractions/gtk>
-  include <abstractions/fontconfig-cache-read> 
-  include <abstractions/python>
-  include <abstractions/fontconfig-cache-write>
-  include <abstractions/gvfs-open>
   include <abstractions/graphics>
+  include <abstractions/python>
+  include <abstractions/gvfs-open>
   include <abstractions/video>
   include <abstractions/lxqt>
+  include <abstractions/nameservice-strict>
   include <abstractions/thumbnails-cache-read>
   include <abstractions/qt5-shader-cache>
-  include <abstractions/X>
+  include <abstractions/X-strict>
   
   ptrace (read),
 
-  @{exec_pathBleach}		mr,
-
+  @{bin}/bleachbit		mr,
+  
   @{bin}/loginctl   		rpx,    
   @{bin}/journalctl 		rpx,
   @{bin}/uname 			rpx,
 
-  /etc/ r,
-  /etc/arch-release r,
-  /etc/pulse/client.conf r,
-  /etc/host.conf r,
-  /etc/gai.conf r,
-  /etc/ca-certificates/extracted/tls-ca-bundle.pem r,
+  @{lib}/ 			r,
+  /usr/local/lib/ 		r,
+  /usr/share/bleachbit/{,**}    r,
 
-  /opt/{,**}  r,
-  /usr/share/ rw,
-  /usr/share/** rw,
-  /usr/share/libdrm/amdgpu.ids r,
-  /usr/share/libfm-qt/translations/libfm-qt_de.qm r,
+  owner @{HOME}/ 							r,
+  owner @{HOME}/.mozilla/ 						r,
+  owner @{HOME}/.mozilla/extensions/ 					r,
+  owner @{HOME}/.mozilla/firefox/{,**}					rwk,
+  owner @{HOME}/.thunderbird/{,**}				  	rwk,
+  owner @{HOME}/.thumbnails/{,**}					rwk,
 
-  /etc/fstab r,
-
-  owner @{HOME}/ r,
-  /@{HOME}/** rwlk -> /@{HOME}/**,
-  /@{HOME}/** rw,
-
-  owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch} 	rwk,
+  owner @{user_config_dirs}/ 						r,
   owner @{user_config_dirs}/pulse/cookie 				rwk,
-  owner "@{user_config_dirs}/chromium/Default/Web Data"			rwk,
-  owner @{user_config_dirs}/chromium/Default/History 			rwk,
-  owner @{user_config_dirs}/chromium/Default/Favicons 			rwk,
-  owner @{user_config_dirs}/QtProject.conf r,
+  owner @{user_config_dirs}/bleachbit/bleachbit.ini 			rw,
+  owner @{user_config_dirs}/chromium/{,**}				rwk,
+  owner @{user_config_dirs}/ibus/bus/*@{int}fb-unix-0 			r,
 
-  @{PROC}/ r,
-  owner @{PROC}/@{pid}/mountinfo r,
-  owner @{PROC}/@{pid}/mounts r,
+  owner @{user_cache_dirs}/ 						r, 
+  owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch} 	rwk,
+  owner @{user_cache_dirs}/falkon/{,**}					rwk, 
+  owner @{user_cache_dirs}/chromium/{,**}				rwk,
+  owner @{user_cache_dirs}/mozilla/{,**}				rwk,
+  owner @{user_cache_dirs}/openbox/{,**}				rw,
+  owner @{user_cache_dirs}/thunderbird/{,**}				rwk,
+  owner @{user_cache_dirs}/lxqt-notificationd/{,**}			rw,
+  owner @{user_cache_dirs}/gstreamer-1.0/{,**}				rwk, 
+  owner @{user_cache_dirs}/thumbnails/{,**}				rwk, 
 
-  owner @{run}/user/@{uid}/pulse/ r,
+  owner @{user_share_dirs}/						r,
+  owner @{user_share_dirs}/*						rw,
+  owner @{user_share_dirs}/Trash/{,**}					rwkl,
+  owner @{user_share_dirs}/Trash/**/**/**/**				rwkl,
+  owner @{user_share_dirs}/Trash/**/**/**				rwkl,
 
+  owner @{user_config_dirs}/pcmanfm-qt/lxqt/dir-settings.conf~ 		rwk,
+  owner @{user_config_dirs}/libreoffice/4/{,**}				rwk,
+  owner @{user_config_dirs}/vlc/*					rw,
 
-  owner /var/tmp/etilqs* rwk,
+  /var/tmp/								r,
+  owner /var/tmp/etilqs* 						rwk,
 
-  /dev/shm/ r,
+  /tmp/ 					r,
+  /tmp/.org.chromium.Chromium.@{rand6}/ 	rw,
+  /tmp/.X11-unix/ 				rw,
+  /tmp/vcpkg/ 					rw,
+  /tmp/.ICE-unix/ 				rw,
+  /tmp/.XIM-unix/ 				rw,
+  /tmp/.font-unix/ 				rw,
+  owner /tmp/qtsingleapp-Photo* 		rw,  
+  owner /tmp/@{int}  				rw,
+  owner /tmp/MozillaBackgroundTask-@{hex16}-removeDirectory/ 		rw,
+  owner /tmp/xauth_@{rand6}			rw, 
 
-  owner /tmp/@{int}  rw,
-  /tmp/falkon-@{rand6}/  rwk,
+  /tmp/falkon-@{rand6}/  			rwk,
 
-  /dev/tty			rw,
+  /dev/tty					rw,
+  /dev/shm/ 					r,
+
+  @{PROC}/ 					r,
+  owner @{PROC}/ 				r,
+  owner @{PROC}/@{pid}/mounts 			r,
+
+  deny /run/systemd/inhibit/*	 		rwk,
+  deny owner @{HOME}/Downloads/ 		r,
+  deny owner @{user_config_dirs}/ibus/bus/	r,
 
   include if exists <local/bleachbit>
 }
