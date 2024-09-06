@@ -1,0 +1,26 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+/usr/sbin/ausearch {
+  include <abstractions/base>
+  include <abstractions/consoles>
+  include <abstractions/nameservice>
+
+  /usr/sbin/ausearch mr,
+
+  owner /dev/tty[0-9]* rw,
+
+  owner /etc/audit/auditd.conf r,
+
+  owner /var/log/audit/ r,
+  owner /var/log/audit/* r,
+
+}
+
+# vim:syntax=apparmor
