@@ -1,0 +1,32 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathcuus} = @{lib}/cups/backend/usb
+profile cups-backend-usb @{exec_pathcuus} {
+  include <abstractions/base>
+  include <abstractions/devices-usb>
+
+  capability net_admin,
+
+  network netlink raw,
+
+  signal (receive) set=(kill, term) peer=cupsd,
+
+  @{exec_pathcuus} mr,
+
+  /usr/share/cups/usb/{,**} r,
+
+  /etc/cups/ppd/*.ppd r,
+  /etc/papersize r,
+  owner /etc/udev/udev.conf r,
+
+  include if exists <local/cups-backend-usb>
+}
+
+# vim:syntax=apparmor
