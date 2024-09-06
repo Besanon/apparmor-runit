@@ -33,8 +33,15 @@ profile lxqt-config-input @{exec_pathlx9} {
 
   /etc/udev/udev.conf 			r,
 
+  owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6} rw,
+  owner @{user_config_dirs}/lxqt/session.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/session.conf.@{rand6} rw,
+  owner @{user_config_dirs}/lxqt/lxqt.conf.lock rwk,
+  owner @{user_config_dirs}/lxqt/lxqt-config-input.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-input.conf.@{rand6}  rwkl -> @{user_config_dirs}/lxqt/#@{int},
-  owner @{user_config_dirs}/lxqt/#@{int}  rw,
+  owner @{user_config_dirs}/lxqt/#@{int}  rwk,
+  owner @{user_config_dirs}/lxqt/session.conf.lock rwk,
 
   owner /tmp/@{int}  		        r,
 
