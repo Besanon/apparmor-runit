@@ -1,6 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 # Profile for system dbus, regardless of the dbus implementation used.
@@ -33,8 +33,6 @@ profile dbus-system flags=(attach_disconnected) {
 
   dbus bus=system,
 
-#  @{exec_pathddbu} mrix,   # Original
-#  @{exec_pathddbu} mr,     # withoutconfinement
   @{exec_pathddbu} rPUx,
 
   @{bin}/**                         PUx,
@@ -77,3 +75,5 @@ profile dbus-system flags=(attach_disconnected) {
 
   include if exists <local/dbus-system>
 }
+
+# vim:syntax=apparmor
