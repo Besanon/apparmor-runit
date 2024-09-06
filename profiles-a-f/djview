@@ -71,5 +71,6 @@ profile djview @{exec_pathdq4} {
   /dev/tty 				rw,
 
   deny @{lib}/ r, # asks when viewing PostScript files
-
 }
+
+# vim:syntax=apparmor
