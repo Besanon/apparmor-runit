@@ -1,51 +1,46 @@
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# Copyright (C) 2018-2021 Mikhail Morfikov
+# Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/3.0>,
 
 include <tunables/global>
 
-/etc/cron.daily/logrotate {
+@{exec_pathqq1} = @{lib}/{,dconf/}dconf-service
+profile dconf-service @{exec_pathqq1} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/bash-strict>
-  include <abstractions/nameservice>
+  include <abstractions/bus-session>
+  include <abstractions/dconf-write>
 
-  /etc/init.d/* mixr,
+  signal (receive) set=(term kill hup) peer=dbus-session,
+  signal (receive) set=(term hup kill) peer=gdm{,-session-worker},
+  signal (receive) set=(term, kill)  peer=dbus-daemon,
 
+  dbus receive bus=session
+       interface=org.freedesktop.DBus.Introspectable
+       member=Introspect
+       peer=(name=:*, label=gnome-shell),
 
-  /{usr/,}bin/bash mixr,
-  /{usr/,}bin/cat mixr,
-  /{usr/,}bin/gzip mixr,
-  /{usr/,}bin/kill mixr,
-  /{usr/,}bin/logger mixr,
-  /{usr/,}bin/true mixr,
-  /usr/bin/killall mixr,
-  /usr/sbin/logrotate mixr,
+  @{exec_pathqq1} mr,
 
-  /var/log      r,
-  /var/log/**   wrl,
+  owner @{desktop_config_dirs}/dconf/ rw,
+  owner @{desktop_config_dirs}/dconf/user rw,
+  owner @{desktop_config_dirs}/dconf/user.* rw,
 
-  /var/lib/privoxy/log/**  rwl,
-  /var/lib64/privoxy/log/**  rwl,
+  owner @{user_config_dirs}/dconf/ rw,
+  owner @{user_config_dirs}/dconf/user{,.*} rw,
 
-  / r,
-  /dev/tty wr,
-  /etc/cron.daily/logrotate r,
-  /etc/logrotate.conf r,
-  /etc/logrotate.d r,
-  /etc/logrotate.d/* r,
-  /etc/subdomain.d r,
-  @{PROC} r,
-  @{PROC}/@{pid} r,
-  /tmp w,
-  /tmp/file* wl,
-  /tmp/logrot* wlr,
-  /var/lib/logrotate.status wr,
-  /{run,var}/lock/samba r,
-  /{,var/}run/httpd.pid r,
-  /{,var/}run/syslogd.pid r,
-  /var/spool/slrnpull wr,
-  /var/spool/slrnpull/log* wrl,
+  owner @{user_cache_dirs}/ rw,
+  owner @{user_cache_dirs}/dconf/ rw,
+  owner @{user_cache_dirs}/dconf/user rw,
+
+  @{PROC}/cmdline r,
+
+  /dev/tty@{int} rw,
+
+  include if exists <local/dconf-service>
 }
+
+# vim:syntax=apparmor
