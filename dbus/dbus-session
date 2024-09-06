@@ -1,6 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 # Profile for session dbus, regardless of the dbus implementation used.
@@ -12,13 +12,15 @@ abi <abi/3.0>,
 
 include <tunables/global>
 
-@{exec_pathyy11}  = @{bin}/dbus-run-session
+@{exec_pathyy11}  = @{bin}/dbus-run-session @{bin}/dbus-update-activation-environment
 @{exec_pathyy11} += @{bin}/dbus-broker @{bin}/dbus-broker-launch
 @{exec_pathyy11} += @{lib}/dbus-1{,.0}/dbus-daemon-launch-helper
 profile dbus-session flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/bus-session>
   include <abstractions/nameservice-strict>
+
+  network unix stream,
 
   unix (send receive) type=stream addr=none peer=(label=gnome-shell, addr=none),
 
@@ -31,16 +33,14 @@ profile dbus-session flags=(attach_disconnected) {
 
   dbus bus=session,
 
-#  @{exec_pathyy11} mrix,   # Original
-#  @{exec_pathyy11} mr,     # funktioniert ohne confine
   @{exec_pathyy11} rPUx,
 
   @{bin}/{true,false}                            rix,
-#  @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher  rPx -> dbus-accessibility,
   @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher  rPUx -> dbus-accessibility,
 
   @{bin}/**                   PUx,
   @{lib}/**                   PUx,
+  @{user_share_dirs}/*/**     PUx,
   /usr/share/*/**             PUx,
 
   /etc/dbus-1/{,**} r,
@@ -50,6 +50,11 @@ profile dbus-session flags=(attach_disconnected) {
 
   /etc/machine-id r,
   /var/lib/dbus/machine-id r,
+
+  owner @{HOME}/.var/app/*/**/.ref rw,
+  owner @{HOME}/.var/app/*/**/logs/* rw,
+
+  owner @{user_share_dirs}/dbus-1/services/{,**} r,
 
         @{run}/systemd/users/@{uid} r,
   owner @{run}/user/@{uid}/dbus-1/ rw,
@@ -71,3 +76,5 @@ profile dbus-session flags=(attach_disconnected) {
   
   include if exists <local/dbus-session>
 }
+
+# vim:syntax=apparmor
