@@ -1,5 +1,5 @@
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
@@ -11,6 +11,7 @@ include <tunables/global>
 @{exec_pathliq} += @{lib}/@{multiarch}/{,libexec/}xdg-desktop-portal-lxqt
 profile xdg-desktop-portal-lxqt @{exec_pathliq} {
   include <abstractions/base>
+  include <abstractions/qt5>
   include <abstractions/kde-strict>
   include <abstractions/graphics>
   include <abstractions/nameservice-strict>
@@ -35,3 +36,5 @@ profile xdg-desktop-portal-lxqt @{exec_pathliq} {
   /dev/tty r,
 
 }
+
+# vim:syntax=apparmor
