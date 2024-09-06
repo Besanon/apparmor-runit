@@ -36,6 +36,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   ptrace (read) peer=kwin_wayland,
   ptrace (read) peer=sddm,
   ptrace (read) peer=lxqt-session,
+  ptrace (read) peer=lxqt-powermanagement,
   ptrace (read) peer=lxqt-notificationd,
 
   signal (send) set=(cont) peer=@{p_systemd},
@@ -51,7 +52,6 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
        interface=org.freedesktop.DBus
        member={GetConnectionUnixUser,GetConnectionUnixProcessID}
        peer=(name=org.freedesktop.DBus, label=dbus-system),
-
 
   @{exec_pathelog} mrix,
 
@@ -141,6 +141,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   @{run}/user/@{uid}/gnupg/ r,
   @{run}/user/@{uid}/pulse/ rw,
   @{run}/user/@{uid}/pulse/** rw,
+  @{run}/user/@{uid}/gnupg/ rw,
   @{run}/user/@{uid}/dconf/ rw,
   @{run}/user/@{uid}/dconf/user rw,
   @{run}/user/@{uid}/dbus-1/ rw,
@@ -155,6 +156,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner @{run}/udev/data/+input:input@{int} r,
   owner @{run}/udev/data/+drm:card@{int}-* r,
   owner @{run}/utmp rwk,
+  @{run}/user/@{uid}/ r,
 
   owner @{sys}/firmware/efi/efivars/OsIndicationsSupported-@{uuid} r,
   owner @{sys}/fs/cgroup/elogind/cgroup.procs rw,
@@ -200,3 +202,5 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
 
   include if exists <local/elogind>
 }
+
+# vim:syntax=apparmor
