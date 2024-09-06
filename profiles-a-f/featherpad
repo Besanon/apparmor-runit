@@ -20,7 +20,7 @@ profile featherpad @{exec_pathFea} {
   include <abstractions/gtk>
   include <abstractions/graphics>
   include <abstractions/gvfs-open>
-  include <abstractions/lxqt>
+  include <abstractions/qt5>
   include <abstractions/thumbnails-cache-read>
   include <abstractions/qt5-shader-cache>
   include <abstractions/bus-accessibility>
@@ -28,8 +28,11 @@ profile featherpad @{exec_pathFea} {
   include <abstractions/gvfs-open>
   include <abstractions/user-read-strict>
   include <abstractions/user-write-strict>
+  include <abstractions/nameservice-strict>
   include <abstractions/X>
   
+  signal (receive) peer=lxqt-session,
+
   @{exec_pathFea}			mr,
 
   @{bin}/evince-thumbnailer 		rpx,
@@ -37,6 +40,8 @@ profile featherpad @{exec_pathFea} {
   /usr/share/thumbnailers/{,**} r,
   /usr/share/libfm-qt6/translations/libfm-qt_de.qm r,
   /usr/share/featherpad/translations/featherpad_de.qm r,
+  /usr/share/icu/73.2/icudt73l.dat r,
+  /usr/share/hwdata/pnp.ids r,
 
   /etc/fstab r,
 
@@ -48,21 +53,27 @@ profile featherpad @{exec_pathFea} {
   owner @{user_config_dirs}/QtProject.conf.@{rand6} rw,
   owner @{user_config_dirs}/QtProject.conf.@{rand6}  l -> @{user_config_dirs}/#@{int},
   owner @{user_config_dirs}/featherpad/ r,
-  owner @{user_config_dirs}/featherpad/* rw,
- # owner @{user_config_dirs}/featherpad/**  rwkl -> @{user_config_dirs}/featherpad/#@{int},
+  owner @{user_config_dirs}/featherpad/* rwk,
+  owner @{user_config_dirs}/featherpad/fp.conf.lock rwk,
+  owner @{user_config_dirs}/featherpad/fp.conf.@{rand6} kl -> @{user_config_dirs}/featherpad/#@{int},
 
   owner @{user_share_dirs}/gvfs-metadata/home r,
 
   owner @{user_cache_dirs}/thumbnails/ rw,
 
   owner /tmp/#@{int}		r,
+  owner /tmp/xauth_@{rand6}     rw,
 
-  @{PROC}/sys/kernel/random/boot_id  r,
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
 
   /dev/tty						rw,
 
+  deny owner @{user_share_dirs}/gvfs-metadata/*.log rw,
+  deny owner @{HOME}/.* rw,
+  deny /etc/passwd  r,
+  deny /etc/nsswitch.conf r,
+  
   include if exists <local/featherpad>
 }
 
