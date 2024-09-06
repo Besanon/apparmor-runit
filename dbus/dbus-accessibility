@@ -1,6 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/3.0>,
@@ -18,14 +18,21 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   include <abstractions/nameservice-strict>
 
   signal (receive) set=(term hup kill) peer=dbus-session,
-  signal (receive) set=(term hup kill) peer=sddm,  # ??  alt: =gdm,
+  signal (receive) set=(term hup kill) peer=sddm,  
   signal (receive) set=(term hup kill) peer=gdm{,-session-worker},
 
-  ptrace (read) peer=at-spi2-registryd,  # ??
-  ptrace (read) peer=remmina,  # ??
-  ptrace (read) peer=deja-dup,  # ??
-  ptrace (read) peer=bleachbit,  # ??
-  ptrace (read) peer=lxqt*,  # ??
+  ptrace (read) peer=at-spi2-registryd,  
+  ptrace (read) peer=grsync,  
+  ptrace (read) peer=remmina,  
+  ptrace (read) peer=deja-dup,  
+  ptrace (read) peer=obconf-qt,
+  ptrace (read) peer=bleachbit,  
+  ptrace (read) peer=lxqt*,  
+  ptrace (read) peer=remmina,  
+  ptrace (read) peer=deja-dup,  
+  ptrace (read) peer=obconf-qt,
+  ptrace (read) peer=bleachbit,  
+  ptrace (read) peer=lxqt*,  
 
   dbus bus=accessibility,
 
@@ -37,11 +44,6 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
        peer=(name=:*, label=gnome-shell),
   
   @{exec_pathyy9} mrix,
-
-#   Original unten:
-#  @{bin}/dbus-broker                           rix,
-#  @{bin}/dbus-broker-launch                    rix,
-#  @{bin}/dbus-daemon                           rix,
 
   @{bin}/dbus-broker                           rPUx,  # mr,
   @{bin}/dbus-broker-launch                    rPUx,  # mr,
@@ -80,3 +82,5 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
 
   include if exists <local/dbus-accessibility>
 }
+
+# vim:syntax=apparmor
