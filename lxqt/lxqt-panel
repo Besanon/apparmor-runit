@@ -77,6 +77,7 @@ profile lxqt-panel @{exec_pathlx24} {
   @{sys}/devices/@{pci_bus}/0000:00:*/ata@{int}/host@{int}/**/**/**/**/**/*     r,
   @{sys}/devices/system/cpu/cpufreq/policy@{int}/scaling_{cur,min,max}_freq 	r,
   @{sys}/devices/@{pci_bus}/**/**/nvme/nvme0/nvme0n1/nvme0n1p4/uevent 		r,
+  @{sys}/devices/@{pci_bus}/**/**/usb5/**/**/host0/target0:0:0/0:0:0:0/block/sda/uevent r,
   @{sys}/devices/@{pci}/usb1/1-2/1-2:*/host3/target3:0:0/3:0:0:0/block/sdb/uevent  r,
   @{sys}/devices/@{pci}/usb1/1-1/1-1:*/host3/target3:0:0/3:0:0:0/block/sdb/uevent  r,
   @{sys}/devices/@{pci}/usb2/2-2/2-2:*/host4/target4:0:0/4:0:0:0/block/sdc/sdc2/uevent r,
