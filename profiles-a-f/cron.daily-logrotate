@@ -13,7 +13,7 @@ include <tunables/global>
   include <abstractions/nameservice>
 
   /etc/init.d/* mixr,
-  
+
   /{usr/,}bin/bash mixr,
   /{usr/,}bin/cat mixr,
   /{usr/,}bin/gzip mixr,
@@ -48,3 +48,5 @@ include <tunables/global>
   /var/spool/slrnpull wr,
   /var/spool/slrnpull/log* wrl,
 }
+
+# vim:syntax=apparmor
