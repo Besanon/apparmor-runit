@@ -23,12 +23,19 @@ profile lxqt-config-appearance @{exec_pathlx6} {
   include <abstractions/nameservice-strict>
 
   @{exec_pathlx6}			mr,
+
   @{bin}/gsettings			rPx,  
   @{bin}/pcmanfm-qt			rPx,
   
   owner @{user_config_dirs}/lxqt/  r,
-  owner @{user_config_dirs}/lxqt/#@{int}  			rw,
-  owner @{user_config_dirs}/pcmanfm-qt/lxqt/settings.conf 	r,
+  owner @{user_config_dirs}/lxqt/#@{int}  			  rwk,
+  owner @{user_config_dirs}/lxqt/lxqt.conf.lock 		  rwk,
+  owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6}  rw,
+  owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6}  l -> @{user_config_dirs}/lxqt/#*,
+  owner @{user_config_dirs}/lxqt/lxqt-config-appearance.conf.lock rwk,
+  owner @{user_config_dirs}/lxqt/lxqt-config-appearance.conf.@{rand6} rw,
+  owner @{user_config_dirs}/lxqt/lxqt-config-appearance.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/pcmanfm-qt/lxqt/settings.conf 	  r,
 
   owner /tmp/#@{int} 			rw,
   owner /tmp/lxqt-config-appearance.@{rand6} rwl -> /tmp/#@{int}, 
