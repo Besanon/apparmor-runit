@@ -1,8 +1,7 @@
-
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2020-2022 Mikhail Morfikov
 # Copyright (C) 2021-2022 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/3.0>,
@@ -43,7 +42,6 @@ profile dbus-daemon @{exec_pathdbusd} flags=(attach_disconnected) {
  signal (receive) peer=runsvdir,
  
   ptrace (read),
-#  ptrace  peer=nm-applet,
 
   @{exec_pathdbusd} mr,
 
@@ -52,7 +50,7 @@ profile dbus-daemon @{exec_pathdbusd} flags=(attach_disconnected) {
   @{bin}/[a-z0-9]*                                                       rPUx,
   @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher                           rPUx, # See #74, #80 & #235
 ## Changes:
-  @{lib}/@{multiarch}/tumbler-1/tumblerd                                  rPx,  #alt: auskommentiert
+  @{lib}/@{multiarch}/tumbler-1/tumblerd                                  rPx, 
   @{lib}/@{multiarch}/xfce[0-9]/xfconf/xfconfd                            rPx,
   @{lib}/*                                                               rPUx,
   @{lib}/atril/atrild                                                     rPx,
@@ -124,8 +122,10 @@ profile dbus-daemon @{exec_pathdbusd} flags=(attach_disconnected) {
 
 ## Changes :
   capability dac_override,
-  owner /tmp/{,**} r,
+  owner /tmp/@{int}  r,
   owner @{user_config_dirs}/glib-2.0/settings/{,**}  r,  
   owner @{user_share_dirs}/sddm/xorg-session.log rw,
   include if exists <local/dbus-daemon>
 }
+
+# vim:syntax=apparmor
