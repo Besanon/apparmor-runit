@@ -1,0 +1,23 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2022-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathcuimp} = @{lib}/cups/backend/implicitclass
+profile cups-backend-implicitc @{exec_pathcuimp} {
+  include <abstractions/base>
+
+  @{exec_pathcuimp} mr,
+
+  /etc/papersize r,
+
+  /dev/ttyS@{int} w,
+
+  include if exists <local/cups-backend-implicitc>
+}
+
+# vim:syntax=apparmor
