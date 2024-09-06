@@ -16,3 +16,5 @@ profile xdg-desktop-portal-validate-icons @{exec_pathvali} {
   @{exec_pathvali} mr,
 
 }
+
+# vim:syntax=apparmor
