@@ -1,10 +1,9 @@
-
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -17,10 +16,10 @@ profile nm-connection-editor @{exec_pathnmoc} {
   include <abstractions/dbus-strict>
   include <abstractions/fonts>
   include <abstractions/graphics>
+  include <abstractions/gvfs-open>
   include <abstractions/freedesktop.org>
   include <abstractions/bus/org.freedesktop.NetworkManager>
   include <abstractions/fontconfig-cache-read>
-  include <abstractions/lxqt>
   include <abstractions/qt5>
   include <abstractions/nameservice-strict>
   include <abstractions/openssl>
@@ -44,9 +43,12 @@ profile nm-connection-editor @{exec_pathnmoc} {
   /usr/share/p11-kit/modules/ r,
   /usr/share/applications/ r,
   /usr/share/p11-kit/modules/p11-kit-trust.module r,
+  /usr/share/gvfs/remote-volume-monitors/ r,
+  /usr/share/gvfs/remote-volume-monitors/udisks2.monitor r,
 
   /etc/udev/udev.conf r,
   /etc/pulse/client.conf r,
+  /etc/pkcs11/pkcs11.conf r,
   /etc/machine-id r,
   /etc/fstab r,
 
@@ -55,6 +57,7 @@ profile nm-connection-editor @{exec_pathnmoc} {
   owner @{user_config_dirs}/pulse/cookie r,  
   owner @{user_config_dirs}/pulse/ rw,
   owner @{user_config_dirs}/ibus/bus/ r,
+  owner @{user_config_dirs}/ibus/bus/{,**} r,
   owner @{user_config_dirs}/user-dirs.dirs r,
 
   owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch}  rw,
@@ -75,3 +78,5 @@ profile nm-connection-editor @{exec_pathnmoc} {
 
   include if exists <local/nm-connection-editor>
 }
+
+# vim:syntax=apparmor
