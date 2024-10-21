@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -14,6 +14,7 @@ profile lximage-qt @{exec_pathLXI} {
   include <abstractions/lxqt>
   include <abstractions/dbus-session-strict>
   include <abstractions/dbus-accessibility-strict>
+  include <abstractions/fontconfig-cache-read>
   include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
   include <abstractions/user-read-strict>
@@ -28,6 +29,7 @@ profile lximage-qt @{exec_pathLXI} {
   /usr/share/desktop-directories/{,**} r,
   /usr/share/lximage-qt/translations/{,**} r,
   /usr/share/libfm-qt6/translations/libfm-qt_de.qm  r,
+  /usr/share/libfm-qt6/archivers.list r,
   /usr/share/thumbnailers/{,**} r,
   /usr/share/gvfs/remote-volume-monitors/ r,
   /usr/share/gvfs/remote-volume-monitors/udisks2.monitor r,
@@ -35,6 +37,8 @@ profile lximage-qt @{exec_pathLXI} {
   /etc/fstab r,
   /etc/nsswitch.conf r,
   /etc/xdg/menus/lxqt-applications.menu r,
+
+  owner @{HOME}/filename.config r,
 
   owner @{user_cache_dirs}/thumbnails/normal/** 	rwk,
   owner @{user_config_dirs}/#@{int} 			rwk,
@@ -52,11 +56,17 @@ profile lximage-qt @{exec_pathLXI} {
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
 
-  owner @{HOME}/.xscreensaver r,
+  @{run}/mount/utab r,
 
   owner /tmp/@{int}  				r,
+  owner /tmp/xauth_@{rand6} 			r,
 
   /dev/tty					rw,
 
+  deny owner @{HOME}/.* r,
+  deny owner @{HOME}/filename.config r,
+
   include if exists <local/lximage-qt>
 }
+
+# vim:syntax=apparmor
