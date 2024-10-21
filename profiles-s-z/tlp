@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -89,8 +89,7 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   @{sys}/devices/system/cpu/cpufreq/policy@{int}/energy_performance_preference rw,
   @{sys}/devices/system/cpu/cpufreq/policy@{int}/scaling_governor rw,
   owner @{sys}/devices/@{pci}/ta@{int}/host@{int}/scsi_host/ r,
-  owner @{sys}/devices/@{pci}/ta@{int}/host@{int}/**/**/power/autosuspend_delay_ms r,
-  owner @{sys}/devices/@{pci}/ta@{int}/host@{int}/target@{int}*/**/block/{sda,sr0}/* r,
+  owner @{sys}/devices/@{pci}/ta@{int}/host@{int}/scsi_host/host@{int}/link_power_management_policy rw,
   @{sys}/firmware/acpi/platform_profile* rw,
   @{sys}/firmware/acpi/pm_profile* rw,
   @{sys}/devices/virtusl/**               rw,
@@ -117,6 +116,9 @@ profile tlp @{exec_pathTLP} flags=(attach_disconnected) {
   /dev/disk/by-id/ r,
   owner /dev/sda r,
   /dev/tty rw,
+  
+  deny capability sys_admin,
+  deny capability sys_ptrace,
 
   include if exists <local/tlp>
 }
