@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -51,8 +51,8 @@ profile lxqt-config @{exec_pathlx5} {
   owner @{user_config_dirs}/lxqt/ r,
   owner @{user_config_dirs}/lxqt/#@{int}	rw,
   owner @{user_config_dirs}/lxqt/lxqt-config.conf.lock rwk,
-  owner @{user_config_dirs}/lxqt/lxqt-config.conf.@{rand6} rw,
-  owner @{user_config_dirs}/lxqt/lxqt-config.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/lxqt-config.conf.@{rand6} rwl -> @{user_config_dirs}/lxqt/#@{int8}7,
+  owner @{user_config_dirs}/lxqt/lxqt-config.conf.@{rand6} rwl -> @{user_config_dirs}/lxqt/#@{int8}2,
 
   owner /tmp/@{int}  		       		r,
 
