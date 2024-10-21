@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -199,6 +199,8 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner /dev/dri/card@{int} rw,
   owner /dev/tty@{int} rw,
         /dev/tty@{int} rw,
+
+  deny @{run}/user/@{uid}/webkitgtk/ r,
 
   include if exists <local/elogind>
 }
