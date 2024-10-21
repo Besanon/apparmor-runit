@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -17,16 +17,21 @@ profile lxqt-admin-time @{exec_pathlx2} {
   include <abstractions/dbus-session-strict>
   include <abstractions/dbus-accessibility-strict>
   include <abstractions/gvfs-open>
-  
+  include <abstractions/nameservice-strict>
+    
   @{exec_pathlx2}			mr,
   
-  owner @{user_config_dirs}/lxqt/** rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  @{bin}/pkexec                         rpx,
+
+  owner @{user_config_dirs}/lxqt/TimeDate.conf rwkl -> @{user_config_dirs}/lxqt/#@{int8}9,
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
+  owner @{user_config_dirs}/lxqt/TimeDate.conf.lock rwk,
 
   owner /tmp/@{int}  		       r,
-
-  @{PROC}/sys/kernel/random/boot_id     r,
 
   /dev/tty				rw,
 
   include if exists <local/lxqt-admin-time>
 }
+
+# vim:syntax=apparmor
