@@ -15,9 +15,9 @@ profile bleachbit @{bin}/bleachbit {
   include <abstractions/python>
   include <abstractions/gvfs-open>
   include <abstractions/video>
-  include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
   include <abstractions/thumbnails-cache-read>
+  include <abstractions/qt5>
   include <abstractions/qt5-shader-cache>
   include <abstractions/X-strict>
   
@@ -79,6 +79,7 @@ profile bleachbit @{bin}/bleachbit {
   /tmp/.font-unix/ 				rw,
   owner /tmp/qtsingleapp-Photo* 		rw,  
   owner /tmp/@{int}  				rw,
+  owner /tmp/MozillaMailnews/ 			rw,
   owner /tmp/MozillaBackgroundTask-@{hex16}-removeDirectory/ 		rw,
   owner /tmp/xauth_@{rand6}			rw, 
 
@@ -90,10 +91,12 @@ profile bleachbit @{bin}/bleachbit {
   @{PROC}/ 					r,
   owner @{PROC}/ 				r,
   owner @{PROC}/@{pid}/mounts 			r,
+  owner @{PROC}/@{pid}/task/@{tid}/fd/ 		r,
 
   deny /run/systemd/inhibit/*	 		rwk,
   deny owner @{HOME}/Downloads/ 		r,
   deny owner @{user_config_dirs}/ibus/bus/	r,
+  deny owner @{HOME}/.Xdefaults			r,
 
   include if exists <local/bleachbit>
 }
