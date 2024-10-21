@@ -3,13 +3,14 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathyy9} = @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher
 profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   include <abstractions/base>
+  include <abstractions/consoles>
   include <abstractions/bus-accessibility>
   include <abstractions/bus-session>
   include <abstractions/bus/org.a11y>
@@ -18,24 +19,17 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   include <abstractions/nameservice-strict>
 
   signal (receive) set=(term hup kill) peer=dbus-session,
-  signal (receive) set=(term hup kill) peer=sddm,  
+  signal (receive) set=(term hup kill) peer=sddm,  # ??  alt: =gdm,
   signal (receive) set=(term hup kill) peer=gdm{,-session-worker},
 
-  ptrace (read) peer=at-spi2-registryd,  
-  ptrace (read) peer=grsync,  
-  ptrace (read) peer=remmina,  
-  ptrace (read) peer=deja-dup,  
+  ptrace (read) peer=at-spi2-registryd,  # ??
+  ptrace (read) peer=grsync,  # ??
+  ptrace (read) peer=remmina,  # ??
   ptrace (read) peer=obconf-qt,
-  ptrace (read) peer=bleachbit,  
-  ptrace (read) peer=lxqt*,  
-  ptrace (read) peer=remmina,  
-  ptrace (read) peer=deja-dup,  
-  ptrace (read) peer=obconf-qt,
-  ptrace (read) peer=bleachbit,  
-  ptrace (read) peer=lxqt*,  
+  ptrace (read) peer=bleachbit,  # ??
+  ptrace (read) peer=lxqt*,  # ??
 
-  dbus bus=accessibility,
-
+  #aa:dbus own bus=accessibility name=org.freedesktop.DBus
   #aa:dbus own bus=session name=org.a11y.{B,b}us
 
   dbus receive bus=session
@@ -45,13 +39,20 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   
   @{exec_pathyy9} mrix,
 
-  @{bin}/dbus-broker                           rPUx,  # mr,
-  @{bin}/dbus-broker-launch                    rPUx,  # mr,
-  @{bin}/dbus-daemon                           rPUx,  # mr,
-
-  @{lib}/at-spi2-registryd                     rPUx,
-  @{lib}/at-spi2{,-core}/at-spi2-registryd     rPUx,
-
+#   Original unten:
+  @{bin}/dbus-broker                           rix,
+  @{bin}/dbus-broker-launch                    rix,
+  @{bin}/dbus-daemon                           rix,
+  @{lib}/at-spi2-registryd                     rPx,
+  @{lib}/at-spi2{,-core}/at-spi2-registryd     rPx,
+#
+# Funktionierend bis Sep 24:
+#  @{bin}/dbus-broker                           rPUx,  # mr,
+#  @{bin}/dbus-broker-launch                    rPUx,  # mr,
+#  @{bin}/dbus-daemon                           rPUx,  # mr,
+#  @{lib}/at-spi2-registryd                     rPUx,
+#  @{lib}/at-spi2{,-core}/at-spi2-registryd     rPUx,
+#
   /usr/share/dbus-1/accessibility-services/{,**} r,
   /usr/share/dconf/profile/gdm r,
   /usr/share/defaults/at-spi2/{,**} r,
@@ -71,14 +72,16 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   @{sys}/kernel/security/apparmor/features/dbus/mask r,
   @{sys}/module/apparmor/parameters/enabled r,
 
-        @{PROC}/@{pid}/cgroup r,
-        @{PROC}/@{pid}/cmdline r,
-        @{PROC}/@{pid}/oom_score_adj r,
+        @{PROC}/1/cgroup r,
+  owner @{PROC}/@{pid}/attr/apparmor/current r,
+  owner @{PROC}/@{pid}/cgroup r,
+  owner @{PROC}/@{pid}/cmdline r,
   owner @{PROC}/@{pid}/fd/ r,
   owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/oom_score_adj r,
 
   owner /tmp/xauth_@{rand6} r,   ##change
-  owner /dev/tty@{int} rw,
+#  owner /dev/tty@{int} rw,
 
   include if exists <local/dbus-accessibility>
 }
