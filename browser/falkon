@@ -4,7 +4,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -36,6 +36,8 @@ profile falkon @{exec_pathFFal} {
   include <abstractions/thumbnails-cache-write>
   include <abstractions/user-download-strict>
   include <abstractions/user-read-strict>
+
+  userns,
 
   network inet dgram,
   network inet stream,
@@ -91,11 +93,15 @@ profile falkon @{exec_pathFFal} {
 
   /usr/lib/qt6/plugins/falkon/*.so  	     	     mr,
   /usr/share/libfm-qt/translations/libfm-qt_de.qm    r,
+  /usr/share/libfm-qt6/archivers.list 		     r,
   /usr/share/@{name}/{,**} 			     r,
   /usr/share/doc/{,**} 				     rw,
+  /usr/share/fontconfig/{,**}			     r,
+  /usr/share/mime/{,**}				     r,
   /usr/share/publicsuffix/public_suffix_list.dafsa   r,
   /usr/share/qt6/** 				     rw,
-  /usr/share/thumbnailers/ 			     r,
+  /usr/share/libfm-qt6/translations/libfm-qt_de.qm   r,
+  /usr/share/thumbnailers/{,**}			     r,
   /usr/share/webext/{,**} 			     r,
   /usr/share/hunspell-bdic/ 			     r,
 
@@ -124,13 +130,16 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/falkon/profiles/profiles.ini.@{rand6} l -> @{user_config_dirs}/falkon/profiles/#*,
   owner @{user_config_dirs}/falkon/profiles/default/{,**} rw,
   owner "@{user_config_dirs}/falkon/profiles/default/adblock/peter lowe's list.txt" l -> @{user_config_dirs}/falkon/profiles/default/adblock/#@{int},
+  owner @{user_config_dirs}/falkon/profiles/default/adblock/easylist.txt.@{rand6} l -> @{user_config_dirs}/falkon/profiles/default/adblock/#@{int},
   owner @{user_config_dirs}/falkon/profiles/default/adblock/easyprivacy.txt l -> @{user_config_dirs}/falkon/profiles/default/adblock/#@{int},
+  owner @{user_config_dirs}/falkon/profiles/default/adblock/nocoinlist.txt.@{rand6} l -> @{user_config_dirs}/falkon/profiles/default/adblock/#@{int},
   owner @{user_config_dirs}/falkon/profiles/default/bookmarks.json.@{rand6} l -> @{user_config_dirs}/falkon/profiles/default/#@{int},
   owner @{user_config_dirs}/falkon/profiles/default/browsedata.db rwk,
   owner @{user_config_dirs}/falkon/profiles/default/Cookies rwk,
   owner @{user_config_dirs}/falkon/profiles/default/databases/Databases.db rwk,
   owner @{user_config_dirs}/falkon/profiles/default/History rwk,
   owner @{user_config_dirs}/falkon/profiles/default/Favicons rwk,
+  owner @{user_config_dirs}/falkon/profiles/default/IndexedDB/** rwk,
   owner @{user_config_dirs}/falkon/profiles/default/IndexedDB/**/LOCK rwk,
   owner "@{user_config_dirs}/falkon/profiles/default/File System/Origins/LOCK" rwk,
   owner "@{user_config_dirs}/falkon/profiles/default/Local Storage/leveldb/LOCK" rwk,
@@ -147,11 +156,13 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/falkon/profiles/default/shared_proto_db/metadata/LOCK rwk,
   owner @{user_config_dirs}/falkon/profiles/default/shared_proto_db/LOCK rwk,
   owner @{user_config_dirs}/falkon/profiles/default/VideoDecodeStats/LOCK rwk,
+  owner @{user_config_dirs}/falkon/profiles/default/WebrtcVideoStats/LOCK rwk,
   owner "@{user_config_dirs}/falkon/profiles/default/Trust Tokens" rwk,
 
   owner @{user_config_dirs}/falkonrc.lock rwk,
   owner @{user_config_dirs}/chromium/WidevineCdm/**   r,
-  owner @{user_config_dirs}/chromium/WidevineCdm/4.10.2710.0/_platform_specific/linux_x64/*.so  m,
+  owner @{user_config_dirs}/chromium/WidevineCdm/4.10.2710.0/_platform_specific/linux_x64/*.so  m, 
+  owner @{user_config_dirs}/chromium/WidevineCdm/4.10.2830.0/_platform_specific/linux_x64/*.so  m, 
   owner @{user_config_dirs}/gtk-{3,4}.0/assets/*.svg r,
   owner @{user_config_dirs}/ibus/bus/ r,
   owner @{user_config_dirs}/ibus/bus/@{hex32}-unix-{,wayland-}@{int} r,
@@ -161,6 +172,8 @@ profile falkon @{exec_pathFFal} {
   owner @{user_config_dirs}/kioslaverc r,
   owner @{user_config_dirs}/QtProject.conf rwk,
   owner @{user_config_dirs}/QtProject.conf.lock rwk,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6} rwk,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6} l -> @{user_config_dirs}/#@{int},
   owner @{user_config_dirs}/mimeapps.list{,.@{rand6}} rw,
   owner @{user_config_dirs}/falkonrc.lock rw,
 
@@ -203,6 +216,8 @@ profile falkon @{exec_pathFFal} {
   @{sys}/devices/@{pci}/drm/card@{int}/ r,
   @{sys}/devices/@{pci}/drm/renderD128/ r,
   @{sys}/devices/@{pci}/drm/renderD129/ r,
+  @{sys}/devices/@{pci_bus}/**/**/usb1/1-1/{idVendor,idProduct} r,
+  @{sys}/devices/@{pci_bus}/**/**/usb1/1-1/1-1:*/interface r,
   @{sys}/fs/cgroup/cpu,cpuacct/cpu.cfs_quota_us r,
 
   owner @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/user@@{uid}.service/background.slice/*/cpu.max r,
@@ -247,9 +262,12 @@ profile falkon @{exec_pathFFal} {
   deny owner @{user_share_dirs}/gvfs-metadata/{,*} r,
   deny capability sys_admin,
   deny capability sys_chroot,
+  deny capability sys_ptrace,
   deny @{HOME}/.cache/fontconfig/ rw,
   deny @{HOME}/.cache/fontconfig/** rw,
   deny @{HOME}/.config/gtk-2.0/ rw,
+  deny @{HOME}/.config/gtk-3.0/ rw,
+  deny @{HOME}/.config/gtk-4.0/ rw,
   deny @{HOME}/.config/gtk-2.0/** rw,
   deny @{PROC}/@{pid}/net/route r,
   deny /sys/devices/virtual/block/*/uevent r,
@@ -288,7 +306,7 @@ profile falkon @{exec_pathFFal} {
   deny @{sys}/devices/virtual/block/*/uevent r,
   deny @{PROC}/@{pid}/net/if_inet6 r,
   deny @{PROC}/@{pid}/net/route r,
-# Ende NEU
+# End new
 
   include if exists <local/falkon>
 }
