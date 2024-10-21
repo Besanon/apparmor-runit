@@ -8,7 +8,7 @@
 # "dbus-session". It is intended to be used only via "Px ->" or via 
 # systemd drop-in AppArmorProfile= setting.
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -18,6 +18,7 @@ profile dbus-system flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/consoles>
   include <abstractions/bus-system>
+  include <abstractions/deny-sensitive-home>
   include <abstractions/nameservice-strict>
 
   capability audit_write,
@@ -31,9 +32,11 @@ profile dbus-system flags=(attach_disconnected) {
   network bluetooth stream,
   network bluetooth seqpacket,
 
-  dbus bus=system,
+  ptrace (read) peer=@{p_systemd},  # Neu
 
-  @{exec_pathddbu} rPUx,
+  #aa:dbus own bus=accessibility name=org.freedesktop.DBus
+
+  @{exec_pathddbu} mrix,   # Original
 
   @{bin}/**                         PUx,
   @{lib}/**                         PUx,
@@ -41,20 +44,23 @@ profile dbus-system flags=(attach_disconnected) {
 
   /etc/dbus-1/{,**} r,
   /usr/share/dbus-1/{,**} r,
-  /var/lib/snapd/dbus-1/{,**} r,
   @{system_share_dirs}/dbus-1/{,**} r,
 
   /etc/machine-id r,
   /var/lib/dbus/machine-id r,
 
-  @{desktop_share_dirs}/icc/ r,
-  @{desktop_share_dirs}/icc/edid-@{hex32}.icc r,
-  @{user_share_dirs}/icc/ r,
-  @{user_share_dirs}/icc/edid-@{hex32}.icc r,
+  @{att}/@{desktop_share_dirs}/icc/ r,
+  @{att}/@{desktop_share_dirs}/icc/edid-@{hex32}.icc r,
+  @{att}/@{user_share_dirs}/icc/ r,
+  @{att}/@{user_share_dirs}/icc/edid-@{hex32}.icc r,
+
+  # Dbus can receive any user files
+  @{HOME}/** r,
 
   @{run}/systemd/users/@{int} r,
-  @{run}/systemd/sessions/*.ref rw,
-  @{run}/systemd/inhibit/*.ref rw,
+
+  @{att}/@{run}/systemd/inhibit/@{int}.ref rw,
+  @{att}/@{run}/systemd/sessions/{,@{l}}@{int}.ref rw,
 
   @{sys}/kernel/security/apparmor/.access rw,
   @{sys}/kernel/security/apparmor/features/dbus/mask r,
