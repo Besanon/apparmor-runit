@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -70,7 +70,10 @@ profile djview @{exec_pathdq4} {
 
   /dev/tty 				rw,
 
+#  @{sys}/devices/@{pci_bus}/**/**/{vendor,device}               r,
+
   deny @{lib}/ r, # asks when viewing PostScript files
+
 }
 
 # vim:syntax=apparmor
