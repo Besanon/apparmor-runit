@@ -3,16 +3,21 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 profile @{bin}/xbps-src {
-  #include <abstractions/base>
-  #include <abstractions/nameservice>
+  include <abstractions/base>
+  include <abstractions/nameservice>
 
-  /					r,
-  /dev/tty				wr,
   @{bin}/xbps-src                       mr,
 
+  /					r,
+
+  /dev/tty				wr,
+
+  include if exists <local/xbps-src>
 }
+
+# vim:syntax=apparmor
