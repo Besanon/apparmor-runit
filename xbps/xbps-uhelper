@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -14,9 +14,18 @@ profile @{bin}/xbps-uhelper {
 
   @{bin}/xbps-uhelper   mr,
 
-  /						r,
+  /			r,
 
-  /dev/tty				wr,
+  /usr/share/xbps.d/		r,
+  /usr/share/xbps.d/*.conf 	r,
 
-  /dev/pts/@{int}  rw,
+  /etc/xbps.d/ 			r,
+  /etc/xbps.d/*.conf 		r,
+
+  /dev/tty		wr,
+  /dev/pts/@{int}  	rw,
+
+  include if exists <local/xbps-uhelper>
 }
+
+# vim:syntax=apparmor
