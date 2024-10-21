@@ -3,14 +3,13 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathxbpsr} = @{bin}/xbps-remove 
 profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/common/apt>
   include <abstractions/bus-system>
   include <abstractions/bus/org.freedesktop.login1>
   include <abstractions/bus/org.freedesktop.PackageKit>
@@ -57,13 +56,23 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
 
   @{exec_pathxbpsr} mr,
 
+  @{lib}exec/xbps-triggers/mimedb 	    rix,
+  @{lib}exec/xbps-triggers/pycompile	    rix,
+  @{lib}exec/xbps-triggers/gdk-pixbuf-loaders 	rix,
   @{lib}exec/xbps-triggers/gtk-icon-cache   rix,
   @{lib}exec/xbps-triggers/update-desktopdb rix,
   @{lib}exec/xbps-triggers/kernel-hooks     rix,
+  @{lib}exec/xbps-triggers/mkdirs 	    rix,
+  @{lib}exec/xbps-triggers/system-accounts  rix,
   @{lib}exec/dracut/kernel-hook-postrm	    rix,
   /etc/kernel.d/post-remove/50-grub 	    rix,
   @{bin}/gtk-update-icon-cache 		    rPx,
   @{bin}/update-desktop-database	    rPx,
+  @{bin}/readlink 			    rix,
+  @{bin}/getent 			    rix,	
+  @{bin}/cut 				    rix,
+  @{bin}/head 			            rix,
+  @{bin}/usermod 			    rPx,
 
   @{bin}/ r,
 
@@ -147,5 +156,7 @@ profile xbps-remove @{exec_pathxbpsr} flags=(attach_disconnected) {
 
   }
 
+  include if exists <local/xbps-remove>
 }
 
+# vim:syntax=apparmor
