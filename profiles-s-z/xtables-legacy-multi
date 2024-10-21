@@ -1,8 +1,9 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -21,10 +22,8 @@ profile xtables-legacy-multi @{exec_pathtz37} {
   capability setpcap,
 
   network inet raw,
-  network inet6 raw,
   network netlink raw,
   network inet dgram,
-  network inet6 dgram,
   network packet dgram,
 
   dbus receive bus=system path=/org/fedoraproject/FirewallD1
@@ -53,8 +52,8 @@ profile xtables-legacy-multi @{exec_pathtz37} {
   @{bin}/false                    rix,
   @{bin}/ipset                    rix,
   @{bin}/kmod                     rPx,
-  @{bin}/iptables	             	  rPx,
-  @{bin}/xtables-nft-multi        rPx,
+  @{bin}/ipables		  rPx,
+  @{bin}/xtables-nft-multi        rix,
 
   /usr/local/lib/python3.10/dist-packages/ r,
 
@@ -80,5 +79,7 @@ profile xtables-legacy-multi @{exec_pathtz37} {
   owner @{PROC}/@{pid}/mounts r,
   owner @{PROC}/@{pids}/net/ip_tables_names r,
 
-  owner /dev/pts/1 rwk,
+  owner /dev/pts/@{int} rwk,
 }
+
+# vim:syntax=apparmor
