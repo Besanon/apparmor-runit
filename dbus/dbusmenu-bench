@@ -1,0 +1,19 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathdbusbe} = /usr/libexec/dbusmenu-bench
+profile dbusmenu-bench @{exec_pathdbusbe} {
+  include <abstractions/base>
+  include <abstractions/consoles>
+
+  @{exec_pathdbusbe} mr,
+
+}
+
+# vim:syntax=apparmor
