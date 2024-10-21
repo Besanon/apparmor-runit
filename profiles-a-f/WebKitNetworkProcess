@@ -1,0 +1,64 @@
+## apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2015-2022 Mikhail Morfikov
+# Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathWFalN} = /usr/libexec/webkitgtk-6.0/WebKitNetworkProcess
+profile WebKitNetworkProcess @{exec_pathWFalN} {
+  include <abstractions/base>
+  include <abstractions/bus-session>
+  include <abstractions/bus-system>
+  include <abstractions/qt5>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/graphics-full>
+  include <abstractions/nameservice-strict>
+  include <abstractions/ssl_certs>
+  include <abstractions/thumbnails-cache-read>
+  include <abstractions/thumbnails-cache-write>
+  include <abstractions/user-read-strict>
+
+  network inet dgram,
+  network inet stream,
+  network netlink raw,
+  network packet dgram,
+
+  @{exec_pathWFalN} mr,
+
+  @{sh_path}                 rix,
+
+  owner @{user_config_dirs}/gtk-{3,4}.0/assets/*.svg r,
+
+   owner @{user_cache_dirs}/com.github.johnfactotum.Foliate/{,**} rw,
+   owner @{user_share_dirs}/com.github.johnfactotum.Foliate/storage/salt{,**} rw,
+   owner @{user_cache_dirs}/com.github.johnfactotum.Foliate/HSTS/hsts-storage.sqlite rwk,   
+
+  owner /tmp/@{rand6}.tmp r,
+
+  owner @{PROC}/@{pid}/cgroup r,
+  @{PROC}/zoneinfo r,
+
+  @{sys}/fs/cgroup/memory/memory.memsw.* r,
+  @{sys}/fs/cgroup/memory/memory.*_in_bytes r,
+
+  @{run}/mount/utab r,
+
+        /dev/tty rw,
+  owner /dev/tty@{int} rw, # File Inherit
+
+  # Silencer
+  deny @{run}/user/@{uid}/gnome-shell-disable-extensions w,
+  deny owner @{HOME}/.* r,
+  deny owner @{user_share_dirs}/gvfs-metadata/{,*} r,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
+  deny capability sys_chroot,
+
+  include if exists <local/WebKitNetworkProcess>
+
+}
+
+# vim:syntax=apparmor
