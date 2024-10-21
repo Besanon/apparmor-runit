@@ -28,6 +28,8 @@ profile xfburn @{exec_pathxf} {
   include <abstractions/gvfs-open>
   
   network netlink raw,
+
+  signal (receive) peer=lxqt-session,
   
   @{bin}/xfburn					mr,
  
@@ -39,8 +41,8 @@ profile xfburn @{exec_pathxf} {
   /etc/udev/udev.conf					r,
   /etc/fstab 						r,
   /etc/pulse/client.conf				r,
-  
-  / r,
+
+  / r,  
 
   owner @{HOME}/ r,
   @{HOME}/ r,
@@ -50,7 +52,6 @@ profile xfburn @{exec_pathxf} {
   owner @{user_cache_dirs}/gstreamer-1.0/registry.x86_64.bin 	rw,
   owner @{user_cache_dirs}/gstreamer-1.0/registry.x86_64.bin.*  rw,
   owner @{user_cache_dirs}/event-sound-cache.tdb.* 		rwk,
-  owner @{user_cache_dirs}/mesa_shader_cache/marker rw,
   owner @{user_share_dirs}/sddm/xorg-session.log rw,
 
   owner /tmp/xauth_@{rand6}  				rw,
@@ -84,8 +85,6 @@ profile xfburn @{exec_pathxf} {
   /dev/shm/ r,
   /dev/media@{int}  r,
   /dev/sr@{int}  rwk,
-
-  include if exists <local/xfburn>
 }
 
 # vim:syntax=apparmor
