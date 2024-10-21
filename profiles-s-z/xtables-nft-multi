@@ -1,9 +1,9 @@
- apparmor.d - Full set of apparmor profiles
+# apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -59,10 +59,12 @@ profile xtables-nft-multi @{exec_pathtz39} {
   /usr/share/libalternatives/ebtables*/{,*} r,
   /usr/share/libalternatives/ip{,4,6}tables*/{,*} r,
 
-  /etc/iptables/{,**} r,
+  /etc/iproute2/{,**} r,
+  /etc/iptables/{,**} rw,
   /etc/iptables/zones/{,**} rw,
   /etc/iproute2/group r,
   /etc/iproute2/rt_realms r,
+  /etc/libnl/classid r,
 
   /var/lib/ebtables/lock rwk,
 
@@ -73,6 +75,7 @@ profile xtables-nft-multi @{exec_pathtz39} {
 
         @{PROC}/sys/kernel/modprobe r,
         @{PROC}/sys/net/ipv{4,6}/ip_forward rw,
+	@{PROC}/@{pids}/net/ip_tables_names r,
   owner @{PROC}/@{pid}/fd/ r,
   owner @{PROC}/@{pid}/mounts r,
   owner @{PROC}/@{pids}/net/ip_tables_names r,
@@ -84,4 +87,3 @@ profile xtables-nft-multi @{exec_pathtz39} {
 }
 
 # vim:syntax=apparmor
-
