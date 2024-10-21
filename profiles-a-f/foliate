@@ -1,0 +1,91 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathfol} = @{bin}/foliate
+profile foliate @{exec_pathfol} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/common/bwrap>
+  include <abstractions/dconf>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/fonts>
+  include <abstractions/graphics>
+  include <abstractions/nameservice-strict>
+  include <abstractions/p11-kit>
+  include <abstractions/ssl_certs>
+  include <abstractions/user-download-strict>
+
+  capability dac_override,
+
+  #aa:dbus own bus=session name=com.github.johnfactotum.Foliate
+
+  signal (receive) set=(term) peer=lxqt-session,
+
+  @{exec_pathfol} mr,
+
+  @{bin}/bwrap           rix,
+  @{bin}/gjs-console     rix,
+  @{bin}/xdg-dbus-proxy  rix,
+  @{bin}/speech-dispatcher rPx,
+
+  @{lib}/{,@{multiarch}/}webkitgtk-6.0/WebKitNetworkProcess  rix,
+  @{lib}/{,@{multiarch}/}webkitgtk-6.0/WebKitWebProcess      rix,
+
+  /usr/share/com.github.johnfactotum.Foliate/{,**} r,
+  /usr/share/glib-2.0/schemas/gschemas.compiled r,
+  /usr/share/icu/73.2/icudt73l.dat r,
+  /usr/share/icons/{,**} r,
+  /usr/share/mime/{,**} r,
+  /usr/share/pixmaps/ r,
+  /usr/share/hyphen/{,**} r,
+
+  owner /bindfile@{rand6} rw,
+
+  owner @{HOME}/.icons/default/index.theme r,
+  owner @{HOME}/.Xdefaults r,
+
+  owner @{user_books_dirs}/{,**} r,
+  owner @{user_download_dirs}/{,**} r,
+  owner @{user_documents_dirs}/{,**} r,
+
+  owner @{user_cache_dirs}/com.github.johnfactotum.Foliate/{,**} rwlk,
+  owner @{user_share_dirs}/com.github.johnfactotum.Foliate/{,**} rwlk,
+  owner @{user_share_dirs}/recently-used.xbel.@{rand6} r,
+  owner @{user_share_dirs}/sddm/xorg-session.log rw,
+
+  @{att}/@{run}/systemd/inhibit/@{int}.ref rw,
+  owner @{run}/user/@{uid}/webkitgtk/ w,
+  owner @{run}/user/@{uid}/webkitgtk/a11y-proxy-@{rand6} rw,
+  owner @{run}/user/@{uid}/webkitgtk/bus-proxy-@{rand6} rw,
+  owner @{run}/user/@{uid}/webkitgtk/dbus-proxy-@{rand6} rw,
+  owner @{run}/user/@{uid}/dconf/user rw,
+
+  @{sys}/devices/virtual/dmi/id/chassis_type r,
+  @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/user@@{uid}.service/app.slice/app-dbus*org.gnome.Nautilus.slice/dbus*org.gnome.Nautilus@*.service/memory.* r,
+  @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/user@@{uid}.service/app.slice/app-gnome-com.github.johnfactotum.Foliate-@{int}.scope/memory.* r,
+  @{sys}/fs/cgroup/memory/memory.* r,
+
+  owner @{PROC}/@{pid}/cmdline r,
+        @{PROC}/sys/net/ipv6/conf/all/disable_ipv6 r,
+        @{PROC}/zoneinfo r,
+  owner @{PROC}/@{pid}/cgroup r,
+  owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/smaps r,
+  owner @{PROC}/@{pid}/stat r,
+  owner @{PROC}/@{pid}/statm r,
+  owner @{PROC}/@{pid}/task/@{tid}/stat r,
+
+  owner /tmp/xauth_@{rand6} r,
+
+  deny @{user_share_dirs}/gvfs-metadata/* r,
+  deny owner @{HOME}/.*/ r,
+
+  include if exists <local/foliate>
+}
+
+# vim:syntax=apparmor
