@@ -1,10 +1,8 @@
-
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -50,8 +48,6 @@ profile runit-init @{exec_pathruni} {
   @{bin}/mandb                      	rPx,
   @{bin}/savelog                    	rPx,
 
-  #/etc/systemd/{,**} 			r,
-  #/etc/udev/hwdb.d/{,**} 		r,
   owner /etc/runit/functions     	r,
   owner /etc/runit/runsvdir/default/ 	r,
   owner /etc/rc.conf             	r,
@@ -64,4 +60,7 @@ profile runit-init @{exec_pathruni} {
 
   /dev/pts/@{int}  			rw,
 
+  include if exists <local/runit-init>
 }
+
+# vim:syntax=apparmor
