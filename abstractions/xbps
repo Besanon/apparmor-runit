@@ -10,3 +10,5 @@
 
   owner /var/db/xbps/{,**}  rw,
   owner /var/db/xbps/*.plist rwk,
+
+# vim:syntax=apparmor
