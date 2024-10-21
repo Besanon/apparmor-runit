@@ -1,10 +1,10 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2019-2021 Mikhail Morfikov
 # Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <M231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -16,6 +16,8 @@ profile sv @{exec_pathSV} flags=(attach_disconnected) {
   include <abstractions/disks-read>
   include <abstractions/nameservice-strict>
 
+  capability dac_read_search,
+  capability dac_override,
   capability fsetid,
   capability fowner,
   capability mknod,
@@ -53,7 +55,12 @@ profile sv @{exec_pathSV} flags=(attach_disconnected) {
  
   owner / r,
 
+  /etc/{,**} r,
   owner /etc/pam.d/** r,
+
+  /var/{,**} r,
+ 
+  @{HOME}/ r,
 
   owner @{lib}/security/** r,
   owner @{lib}/gconv/gconv-modules.d/** r,
@@ -140,7 +147,6 @@ profile sv @{exec_pathSV} flags=(attach_disconnected) {
   owner /dev/shm/ rw,
   owner /dev/pts/@{int} rw,
   owner /dev/ttyS@{int} rwk,
-#  owner @{HOME}/.Xauthority r,
 
   owner /var/log/audit/** rw,
 
@@ -152,3 +158,5 @@ profile sv @{exec_pathSV} flags=(attach_disconnected) {
   owner @{HOME}/.anyRemote/anyremote.stdout w,
 
 }
+
+# vim:syntax=apparmor
