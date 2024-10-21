@@ -1,9 +1,9 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -26,10 +26,10 @@ profile dracut-util @{exec_pathdraiu} flags=(attach_disconnected) {
   @{sh_path}                 rix,
   @{coreutils_path}          rix,
   @{bin}/cpio                rix,
-   @{bin}/hardlink            rix,
+  @{bin}/hardlink            rix,
   @{bin}/ldd                 rix,
-   @{bin}/strip               rix,
-   @{bin}/udevadm             rPx,
+  @{bin}/strip               rix,
+  @{bin}/udevadm             rPx,
 
   @{bin}/{depmod,insmod}     rPx,
   @{bin}/{kmod,lsmod}        rPx,
@@ -58,7 +58,6 @@ profile dracut-util @{exec_pathdraiu} flags=(attach_disconnected) {
   /usr/lib/dracut/modules.d/** r,
   owner @{lib}exec/elogind/elogind-uaccess-command r,
 
-  # Can copy any program to the initframs
   /{usr/,}{local/,}{s,}bin/ r,
   @{bin}/* mr,
   @{bin}/*/ r,
@@ -73,8 +72,6 @@ profile dracut-util @{exec_pathdraiu} flags=(attach_disconnected) {
   /boot/initramfs-*.img* rw,
   /boot/vmlinuz-* r,
 
-
-  # Temp files
   owner @{run}/initramfs/{,**} rw,
   owner @{tmp}/dracut.@{rand6} rw,
   owner @{tmp}/dracut.@{rand6}/{,**} rwl,
@@ -98,3 +95,5 @@ profile dracut-util @{exec_pathdraiu} flags=(attach_disconnected) {
   deny network inet6 stream,
 
 }
+
+# vim:syntax=apparmor
