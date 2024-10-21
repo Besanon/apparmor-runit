@@ -4,21 +4,18 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathQFal} = @{lib}/qt5/libexec/QtWebEngineProcess  @{lib}/qt6/libexec/QtWebEngineProcess 
 profile QtWebEngineProcess @{exec_pathQFal} {
   include <abstractions/base>
+  include <abstractions/qt5>
   include <abstractions/nameservice-strict>
   include <abstractions/ssl_certs>
-  include <abstractions/user-download-strict>
-  include <abstractions/user-read-strict>
 
   network inet dgram,
-#  network inet stream,
-#  network netlink raw,
   network packet dgram,
 
   signal (send, receive) set=(term, kill) peer=falkon,
@@ -34,34 +31,21 @@ profile QtWebEngineProcess @{exec_pathQFal} {
   /usr/share/QtWebEngineProcess/{,**} r,
   /usr/share/doc/{,**} r,
   /usr/share/webext/{,**} r,
-#  /usr/share/xul-ext/kwallet5/* r,
 
-#  /etc/mailcap r,
   /etc/mime.types r,
-#  /etc/opensc.conf r,
-#  /etc/sysconfig/proxy r,
   /etc/xdg/* r,
 
   /var/lib/nscd/services r,
 
   owner @{HOME}/ r,
-  owner @{HOME}/.cups/lpoptions r,
 
-  owner @{user_share_dirs}/applications/userapp-QtWebEngineProcess-@{rand6}.desktop{,.@{rand6}} rw,
-  owner @{user_share_dirs}/mime/packages/user-extension-{htm,html,xht,xhtml,shtml}.xml rw,
-  owner @{user_share_dirs}/mime/packages/user-extension-{htm,html,xht,xhtml,shtml}.xml.* rw,
-  owner @{user_cache_dirs}/qtshadercache-x86_64-little_endian-lp64/#@{int}  wrk,
   owner @{user_config_dirs}/QtWebEngineProcess/profiles/default/TransportSecurity r,
   owner @{user_config_dirs}/QtWebEngineProcess/profiles/default/#@{int} rwk,
   owner @{user_config_dirs}/QtWebEngineProcess/profiles/default/adblock/customlist.txt rwk,
 
-  owner @{user_config_dirs}/ rw,
-  owner @{user_config_dirs}/QtWebEngineProcess/ r,
   owner @{user_config_dirs}/QtWebEngineProcess/* rw,
   owner @{user_config_dirs}/QtWebEngineProcess/profiles/{,**} rwk,
   owner @{user_config_dirs}/QtWebEngineProcess/profiles/default/** rwkl -> @{user_config_dirs}/QtWebEngineProcess/profiles/default/#@{int},
-  owner @{user_cache_dirs}/ rw,
-  owner @{user_cache_dirs}/** rwk,
 
         /tmp/ r,
         /var/tmp/ r,
@@ -69,39 +53,28 @@ profile QtWebEngineProcess @{exec_pathQFal} {
   owner /tmp/@{rand6}.tmp r,
   owner /tmp/QtWebEngineProcess-@{rand6}/ rwk,
   owner /tmp/@{rand8}.txt w,
-  owner /tmp/* w,  # file downloads (to anywhere)
   owner /tmp/QtWebEngineProcess_*/ rw,
   owner /tmp/QtWebEngineProcess_*/* rwk,
-  owner /tmp/Temp-@{uuid}/{**,} rw,
-  owner /tmp/tmp-???.xpi rw,
-  owner /tmp/tmpaddon r,
-  owner /tmp/tmpaddon-@{int} r,
-  @{run}/mount/utab r,
 
   @{sys}/bus/ r,
   @{sys}/cgroup/cpu,cpuacct/user.slice/cpu.cfs_quota_us r,
+  @{sys}/devices/@{pci_bus}/**/**/usb1/1-1/idVendor r,
+  @{sys}/devices/@{pci_bus}/**/**/usb1/1-1/1-1:*/interface r,
   @{sys}/class/ r,
   @{sys}/class/**/ r,
-#  @{sys}/devices/**/uevent r,
-#  @{sys}/devices/@{pci}/ r,
-#  @{sys}/devices/@{pci}/drm/card@{int}/ r,
-#  @{sys}/devices/@{pci}/drm/renderD128/ r,
-#  @{sys}/devices/@{pci}/drm/renderD129/ r,
-#  @{sys}/fs/cgroup/cpu,cpuacct/cpu.cfs_quota_us r,
 
-#  owner @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/user@@{uid}.service/background.slice/*/cpu.max r,
-
-        /dev/ r,
-        /dev/hidraw@{int} rw,
         /dev/tty rw,
-        /dev/video@{int} rw,
-#  owner /dev/shm/org.chromium.* rw,
   owner /dev/tty@{int} rw, # File Inherit
-#  owner /dev/shm/.org.chromium.Chromium.@{rand6}  rwk,
 
-  # Silencer
+  deny capability sys_admin,
+  deny capability sys_chroot,
   deny @{run}/user/@{uid}/gnome-shell-disable-extensions w,
   deny owner @{HOME}/.* r,
   deny owner @{user_share_dirs}/gvfs-metadata/{,*} r,
+  deny network inet6 dgram,
+
+  include if exists <local/QtWebEngineProcess>
 
 }
+
+# vim:syntax=apparmor
