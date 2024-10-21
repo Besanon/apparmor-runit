@@ -48,26 +48,19 @@ profile dbus-daemon @{exec_pathdbusd} flags=(attach_disconnected) {
   @{bin}/ r,
 
   @{bin}/[a-z0-9]*                                                       rPUx,
-#  @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher                           rPUx, # Original, See #74, #80 & #235
   @{lib}/{,at-spi2{,-core}/}at-spi-bus-launcher  			rPx -> dbus-accessibility,  
+
 ## Changes:
-  @{lib}/@{multiarch}/tumbler-1/tumblerd                                  rPx,  #alt: auskommentiert
+  @{lib}/@{multiarch}/tumbler-1/tumblerd                                  rPx, 
   @{lib}/@{multiarch}/xfce[0-9]/xfconf/xfconfd                            rPx,
   @{lib}/*                                                               rPUx,
   @{lib}/atril/atrild                                                     rPx,
   @{lib}/dbus-1*/dbus-daemon-launch-helper                                rPx,
-#  @{lib}/gnome-shell/gnome-shell-calendar-server                          rPx,
   @{lib}/ibus/ibus-*                                                      rPx,
   @{lib}/kauth/{,libexec/}*                                               rPx,
   /usr/libexec/kf6/kiod6                                                  rPx,
   @{lib}exec/kf6/kscreen_backend_launcher				  rPx, 
-#  @{lib}/telepathy/mission-control-5                                      rPx,
   @{lib}/xfce[0-9]/xfconf/xfconfd                                         rPx,
-#  /usr/share/gnome-documents/org.gnome.Documents                          rPx,
-#  /usr/share/gnome-maps/org.gnome.Maps                                   rPUx,
-#  /usr/share/org.gnome.Characters/org.gnome.Characters                    rPx,
-#  /usr/share/org.gnome.Characters/org.gnome.Characters.BackgroundService  rPx,
-
   /etc/dbus-1/{,**} r,
 
   /usr/share/dbus-1/{,**} r,
@@ -85,7 +78,6 @@ profile dbus-daemon @{exec_pathdbusd} flags=(attach_disconnected) {
         @{run}/systemd/users/@{uid} r,
   owner @{run}/user/@{uid}/dbus-1/ rw,
   owner @{run}/user/@{uid}/dbus-1/services/ rw,
-#  owner @{run}/user/@{uid}/gdm/Xauthority r,
   owner @{run}/user/@{uid}/systemd/notify w,
 
   @{sys}/kernel/security/apparmor/.access rw,
