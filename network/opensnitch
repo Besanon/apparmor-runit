@@ -10,15 +10,11 @@ include <tunables/global>
 @{exec_pathtz7o} = @{bin}/opensnitchd @{bin}/opensnitch-ui
 profile opensnitchd @{exec_pathtz7o} {
   include <abstractions/base>
-  include <abstractions/dri>
-  include <abstractions/bus-session>
-  include <abstractions/bus-system>
+  include <abstractions/attached/consoles>
   include <abstractions/graphics>
   include <abstractions/python>
   include <abstractions/fonts>
   include <abstractions/fontconfig-cache-read>
-  include <abstractions/bus/org.freedesktop.PolicyKit1>
-  include <abstractions/bus/org.freedesktop.NetworkManager>
   include <abstractions/nameservice-strict>
 
   capability mknod,
@@ -43,41 +39,28 @@ profile opensnitchd @{exec_pathtz7o} {
   network netlink raw,
   network packet dgram,
 
-  dbus receive bus=system path=/org/fedoraproject/FirewallD1
-       interface=org.fedoraproject.FirewallD1.direct
-       member=passthrough
-       peer=(name=:*, label=libvirtd),
-
-  dbus receive bus=system path=/org/fedoraproject/FirewallD1
-       interface=org.fedoraproject.FirewallD1.zone
-       member={changeZoneOfInterface,getZones}
-       peer=(name=:*, label=libvirtd),
-
-  dbus receive bus=system path=/org/fedoraproject/FirewallD1
-       interface=org.fedoraproject.FirewallD1.zone
-       member={changeZoneOfInterface,removeInterface}
-       peer=(name=:*, label=libvirtd),
-
-  #aa:dbus own bus=system name=org.fedoraproject.FirewallD1
+  signal (receive) peer=lxqt-session,
 
   @{exec_pathtz7o} mr,
 
-  @{bin}/ r,
+  @{bin}/ 			  r,
   @{bin}/alts                     rix,
-  @{bin}/ebtables-legacy          rix,
-  @{bin}/ebtables-legacy-restore  rix,
+  @{bin}/ebtables-legacy          ix,
+  @{bin}/ebtables-legacy-restore  ix,
   @{bin}/false                    rix,
   @{bin}/ipset                    rix,
   @{bin}/kmod                     rPx,
   @{bin}/ldconfig 		  rix,
   @{bin}/mount 			  rPx,
-  @{bin}/xtables-legacy-multi     rix,
-  @{bin}/xtables-nft-multi        rix,
+  @{bin}/xtables-legacy-multi     ix, # rpx alt
+  @{bin}/xtables-nft-multi        ix, # rpx alt
 
   /usr/local/lib/python3.10/dist-packages/ r,
 
   owner /usr/lib/systemd/systemd-timesyncd r,
+  /usr/lib/systemd/systemd-timesyncd r,
   owner /usr/bin/NetworkManager r,
+  /usr/bin/NetworkManager r,
   /usr/share/libalternatives/ r,
   /usr/share/libalternatives/ebtables*/{,*} r,
   /usr/share/libalternatives/ip{,4,6}tables*/{,*} r,
@@ -88,27 +71,30 @@ profile opensnitchd @{exec_pathtz7o} {
 
   /etc/iproute2/group r,
   /etc/iproute2/rt_realms r,
+  /etc/machine-id r,
   owner /etc/opensnitchd/ r,
-  owner /etc/opensnitchd/{,**} r,
+  owner /etc/opensnitchd/{,**} rw,
 
   /var/lib/ebtables/lock rwk,
 
   owner /var/log/opensnitchd.log rw,
 
+  owner @{user_config_dirs}/autostart/opensnitch_ui.desktop rw,
+  owner @{user_config_dirs}/opensnitch/ r,
+  owner @{user_config_dirs}/opensnitch/#* rwk,
   owner @{user_config_dirs}/opensnitch/settings.conf rw,
-  owner @{user_config_dirs}/opensnitch/#@{int} rwk,
-  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} l -> @{user_config_dirs}/opensnitch/#@{int6},
-  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} rw,
-  owner @{user_config_dirs}/opensnitch/settings.conf.lock rwk,
   owner @{user_config_dirs}/opensnitch/actions/ r,
-  owner @{user_config_dirs}/opensnitch/settings.conf r,
+  owner @{user_config_dirs}/opensnitch/settings.conf.lock rwk,
+  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} rwk,
+  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} l -> @{user_config_dirs}/opensnitch/#*,
 
   owner @{user_share_dirs}/applications/ r,
+  owner @{user_share_dirs}/applications/*.desktop r,
 
   owner /tmp/osui.sock rwk,
+  	/tmp/osui.sock rwk,
   owner /tmp/xauth_@{rand6} rw,
 
-#  @{run}/firewalld/{,*} rw,
   @{run}/xtables.lock rwk,
   owner @{run}/user/@{uid}/opensnitch/ rw,
   owner @{run}/user/@{uid}/opensnitch/.@{rand6}/ rw,
@@ -133,6 +119,8 @@ profile opensnitchd @{exec_pathtz7o} {
   owner @{PROC}/@{pid}/mounts r,
   owner @{PROC}/@{pids}/net/ip_tables_names r,
         @{PROC}/sys/net/core/somaxconn r,
+  owner @{PROC}/@{pid}/net/udp r,
+  owner @{PROC}/@{pid}/net/tcp r,
 
   @{sys}/devices/@{pci}/vendor r,
   @{sys}/devices/@{pci}/vice r,
@@ -147,7 +135,7 @@ profile opensnitchd @{exec_pathtz7o} {
   @{sys}/devices/@{pci}/subsystem_vendor r,
   @{sys}/devices/@{pci}/subsystem_device r,
 
-  include if exists <local/opensnitchd>
+  include if exists <local/opensnitch>
 }
 
 # vim:syntax=apparmor
