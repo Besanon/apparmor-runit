@@ -9,69 +9,48 @@ abi <abi/3.0>,
 
 include <tunables/global>
 
-profile /{,usr/}{,s}bin/photoflare {
+profile @{bin}/photoflare {
   include <abstractions/base>
+  include <abstractions/dbus-session>
+  include <abstractions/dbus-accessibility>
   include <abstractions/fonts>
   include <abstractions/graphics>
   include <abstractions/consoles>
-  include <abstractions/qt>
+  include <abstractions/qt5>
   include <abstractions/nameservice>
   include <abstractions/X-strict>
   include <abstractions/user-read-strict>
+  include <abstractions/user-write-strict>
 
-  /{,usr/}{,s}bin/photoflare                    mr,
+  @{bin}/photoflare     			mr,
 
-  /usr/bin/hpijs                                Cx,
-  /usr/bin/dvips                                mrix,
-  /usr/share/hwdata/pnp.ids                     r,
+  /usr/share/hwdata/pnp.ids 			r,
   /usr/share/GraphicsMagick-1.3.43/config/log.mgk     r,
   /usr/share/GraphicsMagick-1.3.43/config/modules.mgk r,
-  /usr/share/photoflare/languages/de.qm         r,
-  /usr/share/icons/{,**}                        r,
-  /usr/lib64/ghostscript/**                     m,
-  /usr/lib64/libgs.so.*                         m,
-  /usr/lib64/libijs-*                           m,
-  owner /usr/share/ghostscript/10.02.1/Resource/**/**   r,
-  owner /usr/share/ghostscript/10.02.1/lib/**           r,
-  owner /usr/share/ghostscript/10.02.1/iccprofiles/**   r,
+  /usr/share/photoflare/languages/de.qm		r,
+  /usr/share/icons/{,**}			r,
 
-  /etc/machine-id                               r,
+  /etc/machine-id 				r,
 
-  owner @{user_config_dirs}/photoflare.io/photoflare.conf.@{rand6} rwkl -> @{user_config_dirs}/photoflare.io/#@>
-  owner @{user_config_dirs}/photoflare.io/photoflare.conf  rw,
-  owner @{user_config_dirs}/photoflare.io/photoflare.conf.lock  rwk,
-  owner @{user_config_dirs}/photoflare.io/#@{int}       rw,
+  owner @{user_config_dirs}/photoflare.io/{,**}         rwk,
+  owner @{user_config_dirs}/photoflare.io/photoflare.conf.@{rand6} l -> @{user_config_dirs}/photoflare.io/#@{int},
+  owner @{user_config_dirs}/#*				rwk,
+  owner @{user_config_dirs}/QtProject.conf 		rw,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6}	rwk,
+  owner @{user_config_dirs}/QtProject.conf.@{rand6} l -> @{user_config_dirs}/#*,
+  owner @{user_config_dirs}/QtProject.conf.lock 	rwk,
 
- 
-  owner @{user_config_dirs}/QtProject.conf              rw,
-  owner @{user_config_dirs}/QtProject.conf.lock         rwk,
-  owner @{user_config_dirs}/QtProject.conf.@{rand6} rwkl -> @{user_config_dirs}/#@{int},
-  owner @{user_config_dirs}/#@{int}                     rw,
+  @{sys}/devices/@{pci}/vendor 				r,
+  @{sys}/devices/@{pci}/vice 				r,
+  @{sys}/devices/@{pci}/uevent 				r,
+  @{sys}/devices/@{pci}/revision 			r,
+  @{sys}/devices/@{pci}/subsystem_vendor 		r,
+  @{sys}/devices/@{pci}/subsystem_device 		r,
+  @{sys}/devices/@{pci}/uevent 				r,
+  @{sys}/devices/@{pci}/revision 			r,
 
-  @{sys}/devices/@{pci}/vendor                          r,
-  @{sys}/devices/@{pci}/vice                            r,
-  @{sys}/devices/@{pci}/uevent                          r,
-  @{sys}/devices/@{pci}/revision                        r,
-  @{sys}/devices/@{pci}/subsystem_vendor                r,
-  @{sys}/devices/@{pci}/subsystem_device                r,
-  @{sys}/devices/@{pci}/uevent                          r,
-  @{sys}/devices/@{pci}/revision                        r,
-
-  owner /tmp/qtsingleapp-Photo*                         rwk,
-
-  profile /usr/bin/hpijs {
-    include <abstractions/base>
-
-    network inet dgram,
-
-    /etc/cups/cupsd.conf r,
-    /etc/hp/hplip.conf r,
-    /usr/bin/hpijs mr,
-    /usr/share/ghostscript/** r,
-    /usr/share/hplip/** r,
-    /usr/share/snmp/mibs/ r,
-    /usr/share/snmp/mibs/*.txt r,
-    owner /var/spool/cups/tmp/gs_?????? rw,
-  }
+  owner /tmp/qtsingleapp-Photo*				rwk,
 
 }
+
+# vim:syntax=apparmor
