@@ -4,14 +4,13 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathxbpsq} = @{bin}/xbps-query
 profile xbps-query @{exec_pathxbpsq} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/common/apt>
   include <abstractions/bus-system>
   include <abstractions/bus/org.freedesktop.login1>
   include <abstractions/bus/org.freedesktop.PackageKit>
@@ -69,21 +68,22 @@ profile xbps-query @{exec_pathxbpsq} flags=(attach_disconnected) {
 
   /usr/share/xml/iso-codes/{,**} r,
   /usr/share/language-selector/data/pkg_depends r,
+  /usr/share/xbps.d/ r,
 
   /etc/xbps.d/ r,
   /etc/xbps.d/{,**} rwk,
   /etc/machine-id r,
-  /var/lib/dbus/machine-id r,
 
+  /var/lib/dbus/machine-id r,
   /var/cache/xbps/ rw,
   /var/cache/xbps/{,**} rw,
+  /var/db/xbps/*.plist r,  
   owner /var/db/xbps/{,**} rwk,
   /var/crash/{,*.@{uid}.crash} rw,
 
   @{user_build_dirs}/** rwkl -> @{user_build_dirs}/**,
 
         /tmp/ r,
-  owner /usr/share/xbps.d/{,**} rw,
 
         @{PROC}/@{pids}/cmdline r,
         @{PROC}/@{pids}/mountinfo r,
@@ -94,5 +94,8 @@ profile xbps-query @{exec_pathxbpsq} flags=(attach_disconnected) {
 
   @{run}/systemd/inhibit/[0-9]*.ref rw,
   owner /tmp/.xbps-script-@{rand6}  rwk,
+
+  include if exists <local/xbps-query>
 }
 
+# vim:syntax=apparmor
