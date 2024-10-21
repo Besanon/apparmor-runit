@@ -3,6 +3,8 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
+abi <abi/4.0>,
+
 include <tunables/global>
 
 @{exec_path41} = @{bin}/ControlPanel
