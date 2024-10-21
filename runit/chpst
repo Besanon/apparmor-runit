@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -12,10 +12,17 @@ profile chpst @{exec_pathCHP} {
   include <abstractions/base>
   include <abstractions/devices-usb>
 
+  network inet stream,
+  network inet dgram,
+  network inet raw,
+  network netlink raw,
+  network packet dgram,
+
   @{exec_pathCHP} 	mr,
 
   @{bin}/agetty		rPx,
   @{bin}/pause 		rPx,
+  @{bin}/stubby		rix,
 }
 
 # vim:syntax=apparmor
