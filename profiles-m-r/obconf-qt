@@ -3,16 +3,15 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
-@{exec_pathobqt} = @{bin}/obconf-qt
-profile obconf-qt @{exec_pathobqt} {
+@{exec_path} = @{bin}/obconf-qt
+profile obconf-qt @{exec_path} {
   include <abstractions/base>
   include <abstractions/dconf-write>
   include <abstractions/gtk>
-  include <abstractions/mesa>
   include <abstractions/fonts>
   include <abstractions/graphics>
   include <abstractions/fontconfig-cache-read>
@@ -22,7 +21,7 @@ profile obconf-qt @{exec_pathobqt} {
   include <abstractions/nameservice-strict>
   include <abstractions/user-download-strict>
 
-  @{exec_pathobqt}				    mr,
+  @{exec_path}				    mr,
 
   /usr/share/obconf/{,*} 			    r,
   /usr/share/ibus/setup/{,**}  			    rw,
