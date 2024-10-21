@@ -1,16 +1,15 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2019-2022 Mikhail Morfikov
-# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathxbpst} = @{lib}exec/xbps-triggers
 profile xbps-triggers @{exec_pathxbpst} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/common/apt>
   include <abstractions/bus-system>
   include <abstractions/bus/org.freedesktop.login1>
   include <abstractions/bus/org.freedesktop.PackageKit>
@@ -72,9 +71,6 @@ profile xbps-triggers @{exec_pathxbpst} flags=(attach_disconnected) {
   /usr/share/xml/iso-codes/{,**} r,
   /usr/share/language-selector/data/pkg_depends r,
 
-#  /etc/machine-id r,
-#  /var/lib/dbus/machine-id r,
-
   /var/cache/xbps/ rw,
   /var/cache/xbps/{,**} rw,
   owner /var/db/xbps/{,**} rwk,
@@ -114,24 +110,6 @@ profile xbps-triggers @{exec_pathxbpst} flags=(attach_disconnected) {
 
   }
 
-#  profile pager {
-#    include <abstractions/base>
-#    include <abstractions/consoles>
-
-#    capability dac_read_search,
-
-#    @{bin}/                      r,
-#    @{sh_path}                   rix,
-#    @{bin}/less                  rPx   -> child-pager,
-#    @{bin}/sensible-pager         mr,
-#    @{bin}/which		 rix,
-
-#    /root/ r,  # For shell pwd
-
-#    owner @{HOME}/.less* rw,
-
-#  }
-
   profile systemctl {
     include <abstractions/base>
     include <abstractions/app/systemctl>
@@ -150,5 +128,7 @@ profile xbps-triggers @{exec_pathxbpst} flags=(attach_disconnected) {
 
   }
 
+  include if exists <local/xbps-triggers>
 }
 
+# vim:syntax=apparmor
