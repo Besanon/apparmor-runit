@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -17,10 +17,6 @@ profile lxqt-panel @{exec_pathlx24} {
   include <abstractions/nameservice-strict>
 
   network inet dgram,
-  network inet stream,          
-  network inet6 dgram,
-  network inet6 stream,
-  network inet dgram,
   network inet stream,
   network netlink raw,
   network packet dgram,
@@ -31,7 +27,7 @@ profile lxqt-panel @{exec_pathlx24} {
   @{bin}/nm-connection-editor       			rPx,
   @{bin}/xdg-open 					rPx,
   @{bin}/ControlPanel 					rPx,
-  @{lib}/librewolf/librewolf                            rPx,
+#  @{lib}/librewolf/librewolf                            rPx,
 
   /usr/lib{,32,64}/lxqt-panel/*.so 			mr,     # LXQT-Plugins
   /usr/lib{,32,64}/lxqt-config/*.so 			mr,     # LXQT-Plugins
@@ -59,8 +55,8 @@ profile lxqt-panel @{exec_pathlx24} {
   owner @{HOME}/.config/menus/applications-merged/                              r,
   owner @{HOME}/Desktop/**                                                      r,
   owner @{HOME}/Desktop/#@{int} 						rw, #new
-  owner @{HOME}/Desktop/pcmanfm-qt.desktop l -> @{HOME}/Desktop/#@{int},	    #new
-  owner @{HOME}/Desktop/pcmanfm-qt.desktop 					rw, #new 
+  owner @{HOME}/Desktop/*.desktop l -> @{HOME}/Desktop/#@{int},	       		#new
+  owner @{HOME}/Desktop/*.desktop 						rw, #new 
   owner @{HOME}/.local/share/desktop-directories/*.directory                    r,
   owner @{HOME}/.local/share/gvfs-metadata/{,*}                                 r,
 
@@ -77,7 +73,12 @@ profile lxqt-panel @{exec_pathlx24} {
   @{sys}/devices/@{pci_bus}/0000:00:*/ata@{int}/host@{int}/**/**/**/**/**/*     r,
   @{sys}/devices/system/cpu/cpufreq/policy@{int}/scaling_{cur,min,max}_freq 	r,
   @{sys}/devices/@{pci_bus}/**/**/nvme/nvme0/nvme0n1/nvme0n1p4/uevent 		r,
-  @{sys}/devices/@{pci_bus}/**/**/usb5/**/**/host0/target0:0:0/0:0:0:0/block/sda/uevent r,
+  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/**/**/host0/target0:0:0/0:0:0:0/block/sda/uevent r,
+  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/**/**/host0/target0:0:0/0:0:0:0/block/sdb/uevent r,
+  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/**/**/host0/target0:0:0/0:0:0:0/block/sda/sda2/uevent r, 
+  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/uevent r,
+  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/**/uevent r,
+
   @{sys}/devices/@{pci}/usb1/1-2/1-2:*/host3/target3:0:0/3:0:0:0/block/sdb/uevent  r,
   @{sys}/devices/@{pci}/usb1/1-1/1-1:*/host3/target3:0:0/3:0:0:0/block/sdb/uevent  r,
   @{sys}/devices/@{pci}/usb2/2-2/2-2:*/host4/target4:0:0/4:0:0:0/block/sdc/sdc2/uevent r,
@@ -90,6 +91,9 @@ profile lxqt-panel @{exec_pathlx24} {
   /dev/tty@{int}                                        rw,
   /dev/pts/@{int}                                       rw,
   /dev/snd/controlC@{int}                               rw,
+
+  deny network inet6 dgram,
+  deny network inet6 stream,
 
   include if exists <local/lxqt-panel>
 }
