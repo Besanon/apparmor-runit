@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -12,12 +12,18 @@ profile @{bin}/xbps-pkgdb {
   include <abstractions/xbps>
   include <abstractions/nameservice>
 
-  /					r,
-  /dev/tty				wr,
   @{bin}/xbps-pkgdb                     mr,
 
-  owner /var/db/xbps/pkgdb-0.38.plist rwk,
+  /					r,
 
-  /dev/pts/@{int}  rw,
+  owner /etc/xbps.d/*.conf		r, 
 
+  owner /var/db/xbps/pkgdb-0.38.plist   rwk,
+
+  /dev/pts/@{int}  			rw,
+  /dev/tty				wr,
+
+  include if exists <local/xbps-pkgdb>
 }
+
+# vim:syntax=apparmor
