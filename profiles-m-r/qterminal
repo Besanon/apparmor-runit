@@ -4,12 +4,13 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathqkon} = @{bin}/qterminal
-profile qterminal @{exec_pathqkon} flags=(attach_disconnected) {
+#profile qterminal @{exec_pathqkon} flags=(attach_disconnected) {
+profile qterminal @{exec_pathqkon} flags=(mediate_deleted) {
   include <abstractions/base>
   include <abstractions/audio-client>
   include <abstractions/bus-accessibility>
@@ -29,7 +30,7 @@ profile qterminal @{exec_pathqkon} flags=(attach_disconnected) {
   @{browsers_path}                      rPx,
   @{bin}/htop	                        rPx,
   @{bin}/dbus-launch 			rPx,
-  @{open_path} rPx -> child-open-help,
+  @{open_path} 				rPx -> child-open-help,
 
   #aa:exec utempter
 
@@ -41,17 +42,21 @@ profile qterminal @{exec_pathqkon} flags=(attach_disconnected) {
   /usr/share/qtermwidget6/{,**} r,
   /etc/xdg/ui/ui_standards.rc r,
 
+  /{,var/}run/systemd/notify w,
+
   owner @{HOME}/@{XDG_SSH_DIR}/config r,
   @{HOME}/.Xdefaults r,
-  owner @{user_config_dirs}/lxqt/lxqt.conf r,
-  owner @{user_config_dirs}/qterminal.org/qterminal.ini 	  rwkl,
-  owner @{user_config_dirs}/qterminal.org/qterminal_bookmarks.xml rw,
-  owner @{user_config_dirs}/qterminal.org/#@{int}  		  rwl,
-  owner @{user_config_dirs}/qterminal.org/qterminal.ini.lock 	  rwkl,
-  owner @{user_config_dirs}/qterminal.org/qterminal.ini.@{rand6} rwl -> @{user_config_dirs}/qterminal.org/#@{int}, 
-  @{user_config_dirs}/qterminal.org/qterminal.ini.@{rand6} rwl -> @{user_config_dirs}/qterminal.org/#@{int}, 
+
   owner @{user_cache_dirs}/icon-cache.kcache rw,
 
+  owner @{user_config_dirs}/lxqt/lxqt.conf r,
+  owner @{user_config_dirs}/qterminal.org/** rw,
+
+   owner @{user_config_dirs}/qterminal.org/#*	 		  rwk,
+   owner @{user_config_dirs}/qterminal.org/qterminal.ini.lock 	  rwk,
+   owner @{user_config_dirs}/qterminal.org/qterminal.ini.@{rand6}  rwk,
+   owner @{user_config_dirs}/qterminal.org/qterminal.ini.@{rand6}  l -> @{user_config_dirs}/qterminal.org/#*,
+ 
   owner /tmp/#@{int} rw,
   owner /tmp/konsole.@{rand6} rw,
 
@@ -61,6 +66,7 @@ profile qterminal @{exec_pathqkon} flags=(attach_disconnected) {
   owner @{PROC}/@{pid}/fd/ r,
   
   /dev/ptmx rw,
+  /dev/pts/@{int} rwk,
 
   owner /tmp/xauth_@{rand6} rw,
 
