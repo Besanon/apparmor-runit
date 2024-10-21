@@ -39,20 +39,12 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   
   @{exec_pathyy9} mrix,
 
-#   Original unten:
   @{bin}/dbus-broker                           rix,
   @{bin}/dbus-broker-launch                    rix,
   @{bin}/dbus-daemon                           rix,
   @{lib}/at-spi2-registryd                     rPx,
   @{lib}/at-spi2{,-core}/at-spi2-registryd     rPx,
-#
-# Funktionierend bis Sep 24:
-#  @{bin}/dbus-broker                           rPUx,  # mr,
-#  @{bin}/dbus-broker-launch                    rPUx,  # mr,
-#  @{bin}/dbus-daemon                           rPUx,  # mr,
-#  @{lib}/at-spi2-registryd                     rPUx,
-#  @{lib}/at-spi2{,-core}/at-spi2-registryd     rPUx,
-#
+
   /usr/share/dbus-1/accessibility-services/{,**} r,
   /usr/share/dconf/profile/gdm r,
   /usr/share/defaults/at-spi2/{,**} r,
@@ -81,7 +73,6 @@ profile dbus-accessibility @{exec_pathyy9} flags=(attach_disconnected) {
   owner @{PROC}/@{pid}/oom_score_adj r,
 
   owner /tmp/xauth_@{rand6} r,   ##change
-#  owner /dev/tty@{int} rw,
 
   include if exists <local/dbus-accessibility>
 }
