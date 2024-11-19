@@ -3,34 +3,27 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/4.0>,
-
 include <tunables/global>
 
-@{exec_path41} = @{bin}/ControlPanel
-profile ControlPanel @{exec_path41} {
+@{exec_pathlx121} = @{bin}/ControlPanel
+profile ControlPanel @{exec_pathlx121} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
+  include <abstractions/bus-accessibility>
+  include <abstractions/fontconfig-cache-read> 
   include <abstractions/lxqt>
-  include <abstractions/nameservice-strict>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
     
-  @{exec_path41}				mr,
+  @{exec_pathlx121}				mr,
 
   /etc/xdg/menus/lxqt-config.menu  		r,
 
   /usr/share/desktop-directories/lxqt-* 	r,
 
-  owner @{HOME}/.foxrc/ rw,
+  owner @{HOME}/.foxrc/ 			rw,
   owner @{HOME}/.foxrc/Desktop 			rw,
 
   owner @{user_config_dirs}/lxqt/lxqt-config.conf.lock rwk,
-  
-  owner /tmp/@{int}  				r,
+
+  owner /tmp/#@{int}  				r,
 
   /dev/pts/@{int}				rw,
   /dev/tty					rw,
