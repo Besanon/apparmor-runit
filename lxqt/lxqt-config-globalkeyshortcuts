@@ -10,25 +10,20 @@ include <tunables/global>
 @{exec_pathlx8} = @{bin}/lxqt-config-globalkeyshortcuts
 profile lxqt-config-globalkeyshortcuts @{exec_pathlx8} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/graphics>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
-  
-  @{exec_pathlx8}			mr,
 
+  @{exec_pathlx8} mr,
+
+  owner @{user_config_dirs}/lxqt/#@{int} rwk,
   owner @{user_config_dirs}/lxqt/lxqt* rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.@{rand6} rwk,
+  owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.lock rwk,
-  owner @{user_config_dirs}/lxqt/#@{int} rw,
 
-  owner /tmp/@{int}  			r,
+  owner /tmp/@{int} r,
 
-  /dev/tty				rw,
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-globalkeyshortcuts>
 }
