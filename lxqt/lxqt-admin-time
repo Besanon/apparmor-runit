@@ -7,24 +7,18 @@ abi <abi/4.0>,
 
 include <tunables/global>
 
-@{exec_pathlx2} = @{bin}/lxqt-admin-time 
+@{exec_pathlx2} = @{bin}/lxqt-admin-time
 profile lxqt-admin-time @{exec_pathlx2} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
-    
+
   @{exec_pathlx2}			mr,
-  
+
   @{bin}/pkexec                         rpx,
 
-  owner @{user_config_dirs}/lxqt/TimeDate.conf rwkl -> @{user_config_dirs}/lxqt/#@{int8}9,
-  owner @{user_config_dirs}/lxqt/#@{int} rw,
+  owner @{user_config_dirs}/lxqt/#@{int} rwk,
+  owner @{user_config_dirs}/lxqt/TimeDate.conf rwkl -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/TimeDate.conf.lock rwk,
 
   owner /tmp/@{int}  		       r,
