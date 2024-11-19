@@ -1,19 +1,18 @@
 # apparmor.d - Full set of apparmor profiles
-# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# Copyright (C) 2023-2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
-@{exec_pathliq}  = @{lib}/xdg-desktop-portal-lxqt
-@{exec_pathliq} += @{lib}/@{multiarch}/{,libexec/}xdg-desktop-portal-lxqt
-profile xdg-desktop-portal-lxqt @{exec_pathliq} {
+@{exec_pathZ}  = @{lib}/xdg-desktop-portal-lxqt
+@{exec_pathZ} += @{lib}/@{multiarch}/{,libexec/}xdg-desktop-portal-lxqt
+profile xdg-desktop-portal-lxqt @{exec_pathZ} {
   include <abstractions/base>
-  include <abstractions/qt5>
-  include <abstractions/kde-strict>
   include <abstractions/graphics>
+  include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
 
   network inet dgram,
@@ -22,19 +21,14 @@ profile xdg-desktop-portal-lxqt @{exec_pathliq} {
   network inet6 stream,
   network netlink raw,
 
-  @{exec_pathliq} mr,
+  @{exec_pathZ} mr,
 
-  owner @{user_cache_dirs}/*.kcache r,
-
-  owner @{user_cache_dirs}/icon-cache.kcache rw,
-
-  owner @{user_config_dirs}/autostart/org.kde.*.desktop r,
-  owner @{user_config_dirs}/xdg-desktop-portal-kderc r,
-
-  @{PROC}/sys/kernel/core_pattern r,
+  owner @{desktop_config_dirs}/user-dirs.dirs r,
+  owner @{desktop_config_dirs}/dconf/user r,
 
   /dev/tty r,
 
+  include if exists <local/xdg-desktop-portal-lxqt>
 }
 
 # vim:syntax=apparmor
