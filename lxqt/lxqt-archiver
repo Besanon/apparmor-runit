@@ -10,40 +10,36 @@ include <tunables/global>
 @{exec_path995} = @{bin}/lxqt-archiver
 profile lxqt-archiver @{exec_path995} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/thumbnails-cache-read>
   include <abstractions/thumbnails-cache-write>
-  
-  @{exec_path995}		mr,
+  include <abstractions/user-read-strict>
+  include <abstractions/user-write-strict>
+
+  @{exec_path995} mr,
 
   /usr/share/lxqt-archiver/translations/lxqt-archiver_de.qm r,
   /usr/share/libfm-qt6/translations/libfm-qt_de.qm r,
-  /usr/share/thumbnailers/ 	 r,
-  /usr/share/thumbnailers/*	 r,
-  
-  /etc/fstab 			 r,
+  /usr/share/thumbnailers/ r,
+  /usr/share/thumbnailers/* r,
 
-  owner @{HOME}/ 		 r,
+  /etc/fstab r,
+
+  owner @{HOME}/ r,
 
   owner @{user_config_dirs}/lxqt/#@{int} rwk,
   owner @{user_config_dirs}/lxqt/archiver.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/archiver.conf l -> @{user_config_dirs}/lxqt/#@{int},
 
   owner @{PROC}/@{pid}/mountinfo r,
-  owner @{PROC}/@{pid}/mounts 	 r,
+  owner @{PROC}/@{pid}/mounts r,
 
-  owner /tmp/@{int}  		 r,
+  owner /tmp/@{int} r,
 
-  /dev/tty			 rw,
+  /dev/tty rw,
 
-  deny  /usr/share/gvfs/remote-volume-monitors/ r,
+  deny /usr/share/gvfs/remote-volume-monitors/ r,
 
   include if exists <local/lxqt-archiver>
 }
