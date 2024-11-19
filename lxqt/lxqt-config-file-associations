@@ -10,21 +10,17 @@ include <tunables/global>
 @{exec_pathlx18} = @{bin}/lxqt-config-file-associations
 profile lxqt-config-file-associations @{exec_pathlx18} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
-      
-  @{exec_pathlx18}			mr,
- 
-  owner @{user_config_dirs}/           r,
-  owner @{user_config_dirs}/mimeapps*  rwk,
-  owner @{user_config_dirs}/lxqt-*     rwk,
-  owner @{user_config_dirs}/lxqt/        r,
+
+  @{exec_pathlx18} mr,
+
+  /etc/machine-id r,
+
+  owner @{user_config_dirs}/ r,
+  owner @{user_config_dirs}/mimeapps* rwk,
+  owner @{user_config_dirs}/lxqt-* rwk,
+  owner @{user_config_dirs}/lxqt/ r,
   owner @{user_config_dirs}/lxqt/#@{int} rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-file-associations.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-file-associations.conf kl -> @{user_config_dirs}/lxqt/#@{int},
@@ -32,9 +28,9 @@ profile lxqt-config-file-associations @{exec_pathlx18} {
   owner /tmp/#@{int} rwk,
 
   owner /opt/tormedium/tor-browser/Browser/browser/chrome/icons/default/default128.png  r,
-  owner /opt/tor/tor-browser/Browser/browser/chrome/icons/default/default128.png 	r,
+  owner /opt/tor/tor-browser/Browser/browser/chrome/icons/default/default128.png r,
 
-  /dev/tty				rw,
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-file-associations>
 }
