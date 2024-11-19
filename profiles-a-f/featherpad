@@ -1,7 +1,6 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2015-2022 Mikhail Morfikov
 # Copyright (C) 2021-2024 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
 abi <abi/4.0>,
@@ -12,28 +11,17 @@ include <tunables/global>
 profile featherpad @{exec_pathFea} {
   include <abstractions/base>
   include <abstractions/consoles>
-  include <abstractions/dbus-session>
-  include <abstractions/dbus-accessibility>
-  include <abstractions/fonts>
-  include <abstractions/fontconfig-cache-read>
-  include <abstractions/freedesktop.org>
-  include <abstractions/fonts>
-  include <abstractions/gtk>
+#  include <abstractions/qt5-shader-cache>
+  include <abstractions/bus-accessibility>
   include <abstractions/graphics>
   include <abstractions/gvfs-open>
-  include <abstractions/qt5>
+  include <abstractions/lxqt>
   include <abstractions/thumbnails-cache-read>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/bus-accessibility>
-  include <abstractions/bus-session>
-  include <abstractions/gvfs-open>
+  include <abstractions/thumbnails-cache-write>
   include <abstractions/user-read-strict>
   include <abstractions/user-write-strict>
   include <abstractions/nameservice-strict>
-  include <abstractions/X>
   
-  signal (receive) peer=lxqt-session,
-
   @{exec_pathFea}			mr,
 
   @{bin}/evince-thumbnailer 		rpx,
@@ -41,14 +29,12 @@ profile featherpad @{exec_pathFea} {
   /usr/share/thumbnailers/{,**} r,
   /usr/share/libfm-qt6/translations/libfm-qt_de.qm r,
   /usr/share/featherpad/translations/featherpad_de.qm r,
-  /usr/share/icu/73.2/icudt73l.dat r,
-  /usr/share/hwdata/pnp.ids r,
 
   /etc/fstab r,
 
   owner @{HOME}/.xscreensaver r,
 
-  owner @{user_config_dirs}/#@{int} rw,
+  owner @{user_config_dirs}/#* rw,
   owner @{user_config_dirs}/QtProject.conf rw,
   owner @{user_config_dirs}/QtProject.conf.lock rwk,
   owner @{user_config_dirs}/QtProject.conf.@{rand6} rw,
@@ -63,18 +49,16 @@ profile featherpad @{exec_pathFea} {
   owner @{user_cache_dirs}/thumbnails/ rw,
 
   owner /tmp/#@{int}		r,
-  owner /tmp/xauth_@{rand6}     rw,
 
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
 
   /dev/tty						rw,
+  owner /dev/tty@{int} rw,
 
   deny owner @{user_share_dirs}/gvfs-metadata/*.log rw,
   deny owner @{HOME}/.* rw,
-  deny /etc/passwd  r,
-  deny /etc/nsswitch.conf r,
-  
+
   include if exists <local/featherpad>
 }
 
