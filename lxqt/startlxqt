@@ -1,8 +1,9 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2023 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -12,7 +13,7 @@ profile startlxqt @{exec_pathstlx} {
   include <abstractions/consoles>
   include <abstractions/freedesktop.org>
   include <abstractions/fontconfig-cache-read> 
-  include <abstractions/qt5>
+  include <abstractions/lxqt>
   include <abstractions/X-strict>
 
   signal (receive) set=(term) peer=sddm,
@@ -23,7 +24,6 @@ profile startlxqt @{exec_pathstlx} {
   @{bin}/xsetroot           rPx,
   @{bin}/xprop 		    rpx,
   @{bin}/mkdir		    rix,
-  @{bin}/dbus-launch 	    rPx,
   @{sh_path}		    rix,
   @{bin}/lxqt-session 	    rPx,
 
@@ -45,14 +45,14 @@ profile startlxqt @{exec_pathstlx} {
 
   owner @{user_cache_dirs}/ rw,
   owner @{user_cache_dirs}/#@{int} rw,
-  @{user_cache_dirs}/ksycoca5_* rwkl -> @{user_cache_dirs}/#@{int},
+        @{user_cache_dirs}/ksycoca5_* rwkl -> @{user_cache_dirs}/#@{int},
 
   owner @{user_config_dirs}/#@{int} rw,
-  owner @{user_config_dirs}/gtkrc rl,
-  owner @{user_config_dirs}/gtkrc-2.0 rl,
-  owner @{user_config_dirs}/kcminputrc r,
+#  owner @{user_config_dirs}/gtkrc rl,
+#  owner @{user_config_dirs}/gtkrc-2.0 rl,
+#  owner @{user_config_dirs}/kcminputrc r,
   owner @{user_config_dirs}/lxqt/ rw,
-  owner @{user_config_dirs}/lxqt/** rwkl -> @{user_config_dirs}/kdedefaults/**,
+#  owner @{user_config_dirs}/lxqt/** rwkl -> @{user_config_dirs}/kdedefaults/**,
   owner @{user_config_dirs}/menus/{,**} r,
 
   owner @{user_share_dirs}/kservices5/{,**} r,
@@ -63,7 +63,6 @@ profile startlxqt @{exec_pathstlx} {
   owner /tmp/startlxqt.@{rand6} rwl -> /tmp/#@{int},
 
   owner @{run}/user/@{uid}/ r,
-        @{run}/user/@{uid}/xauth_@{rand6} rl,
 
         @{PROC}/sys/kernel/core_pattern r,
   owner @{PROC}/@{pid}/maps r,
@@ -87,6 +86,6 @@ profile startlxqt @{exec_pathstlx} {
 
     include if exists <local/startlxqt_dbus>
   }
-
-
 }
+
+# vim:syntax=apparmor
