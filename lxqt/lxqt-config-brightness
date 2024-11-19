@@ -10,28 +10,22 @@ include <tunables/global>
 @{exec_pathlx7} = @{bin}/lxqt-config-brightness
 profile lxqt-config-brightness @{exec_pathlx7} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
 
-  @{exec_pathlx7}			mr,
-  @{bin}/pkexec 			rpx,
+  @{exec_pathlx7} mr,
+  @{bin}/pkexec rpx,
 
-  @{sh_path}				rix,
-  
-  owner @{HOME}/ 			r,
+  @{sh_path} rix,
 
-  owner /tmp/@{int}  			r,
+  owner @{HOME}/ r,
 
-  @{sys}/class/backlight/  		r,  
-  @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/card@{int}-eDP-@{int}/amdgpu_bl@{int}/*  rw,
-  @{sys}/devices/@{pci_bus}/**/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/*  rw,
+  owner /tmp/@{int} r,
 
-  /dev/tty				rw,
+  @{sys}/class/backlight/ r,
+  @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/card@{int}-eDP-@{int}/amdgpu_bl@{int}/* rw,
+  @{sys}/devices/@{pci_bus}/**/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/* rw,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-brightness>
 }
