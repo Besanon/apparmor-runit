@@ -10,19 +10,13 @@ include <tunables/global>
 @{exec_pathlx15} = @{bin}/lxqt-config-printer
 profile lxqt-config-printer @{exec_pathlx15} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
-    
-  @{exec_pathlx15}			mr,
-  
-  owner /tmp/@{int}  			r,
 
-  /dev/tty				rw,
+  @{exec_pathlx15} mr,
+
+  owner /tmp/@{int} r,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-printer>
 }
