@@ -9,9 +9,8 @@ abi <abi/4.0>,
 
 include <tunables/global>
 
-profile @{bin}/android-file-transfer {
+profile @{bin}/android-filetransfer {
   include <abstractions/base>
-  include <abstractions/consoles>
   include <abstractions/fonts>
   include <abstractions/graphics>
   include <abstractions/consoles>
@@ -21,28 +20,23 @@ profile @{bin}/android-file-transfer {
   include <abstractions/user-read-strict>
   include <abstractions/user-write-strict>
 
-  @{bin}/android-file-transfer     			mr,
+  @{bin}/android-filetransfer  			mr,
 
-  /usr/share/hwdata/pnp.ids 			r,
-  /usr/share/icu/73.2/icudt73l.dat		r,
+  /usr/lib/qt6/androiddeploy			mr,
+  /usr/lib/qt6/androiddeploy6			mr,
+  /usr/lib/qt6/androidtestrunner		mr,
+  /usr/lib/qt6/mke2fs.android			mr,
+
   /usr/share/icons/{,**}			r,
 
   /etc/machine-id 				r,
-
-  /var/lib/dbus/machine-id 			r,
 
   owner @{user_config_dirs}/#*				rwk,
   owner @{user_config_dirs}/QtProject.conf 		rw,
   owner @{user_config_dirs}/QtProject.conf.@{rand6}	rwk,
   owner @{user_config_dirs}/QtProject.conf.@{rand6} l -> @{user_config_dirs}/#*,
   owner @{user_config_dirs}/QtProject.conf.lock 	rwk,
-  owner @{user_config_dirs}/whoozle.github.io/#@{int} 	rwk,
-  owner @{user_config_dirs}/whoozle.github.io/aft-linux-qt.conf.@{rand6} rwk,
-  owner @{user_config_dirs}/whoozle.github.io/aft-linux-qt.conf.@{rand6} l -> @{user_config_dirs}/whoozle.github.io/#@{int},
-  owner @{user_config_dirs}/whoozle.github.io/aft-linux-qt.conf rw,
-  owner @{user_config_dirs}/whoozle.github.io/aft-linux-qt.conf.lock rwk,
 
-  @{sys}/bus/usb/devices/ 				r,
   @{sys}/devices/@{pci}/vendor 				r,
   @{sys}/devices/@{pci}/vice 				r,
   @{sys}/devices/@{pci}/uevent 				r,
@@ -51,11 +45,7 @@ profile @{bin}/android-file-transfer {
   @{sys}/devices/@{pci}/subsystem_device 		r,
   @{sys}/devices/@{pci}/uevent 				r,
   @{sys}/devices/@{pci}/revision 			r,
-  @{sys}/devices/@{pci_bus}/**/**/usb@{int}/**/{,**} 	r,
 
-  /dev/bus/usb/**/**  wr,
-
-  include if exists <local/android-file-transfer>
 }
 
 # vim:syntax=apparmor
