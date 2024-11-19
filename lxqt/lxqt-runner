@@ -8,34 +8,30 @@ abi <abi/4.0>,
 include <tunables/global>
 
 @{exec_pathlx27} = @{bin}/lxqt-runner 
-profile lxqt-runner @{exec_pathlx27} {
+profile lxqt-runner @{exec_pathlx27} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
-      
-  @{exec_pathlx27}				mr,
 
-  /usr/share/icons/ 				r,
-  /usr/share/icons/{,**}  			r,
-  /usr/share/desktop-directories/ 		r,
-  /usr/share/desktop-directories/{,**} 		r,
+  @{exec_pathlx27} mr,
 
-  /etc/xdg/menus/lxqt-applications.menu 	r,
+  /usr/share/icons/ r,
+  /usr/share/desktop-directories/ r,
+  /usr/share/desktop-directories/{,**} r,
+
+  /etc/xdg/menus/lxqt-applications.menu r,
 
   owner @{user_config_dirs}/lxqt/lxqt-runner.conf.lock rwk,
-  owner @{user_config_dirs}/lxqt/#@{int}	rw,
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
   owner @{user_config_dirs}/lxqt/lxqt-runner.conf.@{rand6} rwkl  -> @{user_config_dirs}/lxqt/#@{int},
 
   # only needed if tor is installed on /opt
   owner /opt/*/**/*.png  r,
-   
-  owner /tmp/@{int}  				r,
 
-  /dev/tty					rw,
+  owner /tmp/@{int} r,
+
+  owner /dev/tty@{int} rw,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-runner>
 }
