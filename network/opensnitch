@@ -3,19 +3,21 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
 @{exec_pathtz7o} = @{bin}/opensnitchd @{bin}/opensnitch-ui
+#profile opensnitchd @{exec_pathtz7o} flags=(attach_disconnected) {
 profile opensnitchd @{exec_pathtz7o} {
   include <abstractions/base>
-  include <abstractions/attached/consoles>
-  include <abstractions/graphics>
+  include <abstractions/bus-accessibility>
+  include <abstractions/consoles>
   include <abstractions/python>
   include <abstractions/fonts>
   include <abstractions/fontconfig-cache-read>
   include <abstractions/nameservice-strict>
+  include <abstractions/X-strict>
 
   capability mknod,
   capability net_admin,
@@ -43,6 +45,8 @@ profile opensnitchd @{exec_pathtz7o} {
 
   @{exec_pathtz7o} mr,
 
+  @{bin}/xdg-open rPx,
+
   @{bin}/ 			  r,
   @{bin}/alts                     rix,
   @{bin}/ebtables-legacy          ix,
@@ -57,9 +61,7 @@ profile opensnitchd @{exec_pathtz7o} {
 
   /usr/local/lib/python3.10/dist-packages/ r,
 
-  owner /usr/lib/systemd/systemd-timesyncd r,
   /usr/lib/systemd/systemd-timesyncd r,
-  owner /usr/bin/NetworkManager r,
   /usr/bin/NetworkManager r,
   /usr/share/libalternatives/ r,
   /usr/share/libalternatives/ebtables*/{,*} r,
@@ -80,20 +82,19 @@ profile opensnitchd @{exec_pathtz7o} {
   owner /var/log/opensnitchd.log rw,
 
   owner @{user_config_dirs}/autostart/opensnitch_ui.desktop rw,
-  owner @{user_config_dirs}/opensnitch/ r,
-  owner @{user_config_dirs}/opensnitch/#* rwk,
+  owner @{user_config_dirs}/opensnitch/#@{int} rwk,
   owner @{user_config_dirs}/opensnitch/settings.conf rw,
   owner @{user_config_dirs}/opensnitch/actions/ r,
   owner @{user_config_dirs}/opensnitch/settings.conf.lock rwk,
   owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} rwk,
-  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} l -> @{user_config_dirs}/opensnitch/#*,
+  owner @{user_config_dirs}/opensnitch/settings.conf.@{rand6} l -> @{user_config_dirs}/opensnitch/#@{int},
 
+  owner @{user_share_dirs}/sddm/wayland-session.log a,
   owner @{user_share_dirs}/applications/ r,
   owner @{user_share_dirs}/applications/*.desktop r,
 
   owner /tmp/osui.sock rwk,
   	/tmp/osui.sock rwk,
-  owner /tmp/xauth_@{rand6} rw,
 
   @{run}/xtables.lock rwk,
   owner @{run}/user/@{uid}/opensnitch/ rw,
@@ -134,6 +135,8 @@ profile opensnitchd @{exec_pathtz7o} {
   @{sys}/devices/@{pci}/vice r,
   @{sys}/devices/@{pci}/subsystem_vendor r,
   @{sys}/devices/@{pci}/subsystem_device r,
+
+  /dev/dri/renderD128 rw,
 
   include if exists <local/opensnitch>
 }
