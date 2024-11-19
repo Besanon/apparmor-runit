@@ -4,7 +4,7 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
@@ -15,17 +15,17 @@ include <tunables/global>
 
 profile xfburn @{exec_pathxf} {
   include <abstractions/base>
+  include <abstractions/bus-accessibility>
   include <abstractions/consoles>
+  include <abstractions/dconf-write>
   include <abstractions/freedesktop.org>
   include <abstractions/fonts>
   include <abstractions/gtk>
   include <abstractions/graphics>
   include <abstractions/video>
-  include <abstractions/X>
   include <abstractions/nameservice>
-  include <abstractions/bus-accessibility>
-  include <abstractions/bus-session>
   include <abstractions/gvfs-open>
+  include <abstractions/X-strict>
   
   network netlink raw,
 
@@ -53,9 +53,8 @@ profile xfburn @{exec_pathxf} {
   owner @{user_cache_dirs}/gstreamer-1.0/registry.x86_64.bin.*  rw,
   owner @{user_cache_dirs}/event-sound-cache.tdb.* 		rwk,
   owner @{user_share_dirs}/sddm/xorg-session.log rw,
+  owner @{user_share_dirs}/sddm/wayland-session.log a,
 
-  owner /tmp/xauth_@{rand6}  				rw,
-  
   @{sys}/bus/						r,
   @{sys}/class/					r,
   @{sys}/class/block/					r,
@@ -70,19 +69,20 @@ profile xfburn @{exec_pathxf} {
   @{sys}/devices/@{pci_bus}/0000:00:02.0/{revision,config,subsystem_vendor} r,
   @{sys}/devices/@{pci_bus}/0000:00:*.0/0000:01:00.0/{revision,config,vendor}  r,
 
-
   @{PROC}/@{pid}/fd/							r,
   @{PROC}/sys/dev/cdrom/info					r,
   owner @{PROC}/@{pid}/mountinfo 			r,
   owner @{PROC}/@{pid}/mounts 				r,
 
   /run/udev/data/[a-z]*[0-9]*:[0-9]*			r,
-  owner /run/user/@{uid}/gvfs-burn/			    rw,	
+  owner /run/user/@{uid}/gvfs-burn/			rw,	
   owner @{run}/user/@{uid}/pulse/ 			r,
   owner @{user_config_dirs}/pulse/cookie 		rwk,
 
   /dev/ r,
   /dev/shm/ r,
+  owner /dev/tty@{int} rw,
+  owner /dev/shm/wlroots-@{rand6} r,
   /dev/media@{int}  r,
   /dev/sr@{int}  rwk,
 }
