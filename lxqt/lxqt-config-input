@@ -11,27 +11,17 @@ include <tunables/global>
 profile lxqt-config-input @{exec_pathlx9} {
   include <abstractions/audio-client>
   include <abstractions/base>
-  include <abstractions/bus-system>
   include <abstractions/bus/org.bluez>
-  include <abstractions/bus/org.freedesktop.login1>
   include <abstractions/devices-usb>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gtk>
-  include <abstractions/graphics>
-  include <abstractions/gvfs-open>
+  include <abstractions/bus-accessibility>
   include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/video>
-  
-  signal (read) set=(kill,term) peer=lxqt-session,
 
-  @{exec_pathlx9}			mr,
+  @{exec_pathlx9} mr,
   
-  @{bin}/setxkbmap 			rix,  
+  @{bin}/setxkbmap rix,
 
-  /etc/udev/udev.conf 			r,
+  /etc/udev/udev.conf r,
 
   owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/lxqt.conf.@{rand6} rw,
@@ -40,29 +30,29 @@ profile lxqt-config-input @{exec_pathlx9} {
   owner @{user_config_dirs}/lxqt/lxqt.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-input.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-input.conf.@{rand6}  rwkl -> @{user_config_dirs}/lxqt/#@{int},
-  owner @{user_config_dirs}/lxqt/#@{int}  rwk,
+  owner @{user_config_dirs}/lxqt/#@{int} rwk,
   owner @{user_config_dirs}/lxqt/session.conf.lock rwk,
 
-  owner /tmp/@{int}  		        r,
+  owner /tmp/@{int} r,
 
-  @{run}/udev/data/c@{int}:*   		r,
-  @{run}/udev/data/b@{int}:*   		r,
-  @{run}/udev/data/+sound:card@{int}   	r,
-  @{run}/udev/data/+bluetooth:*		r,
-  @{run}/udev/data/+platform:* 		r,
-  @{run}/udev/data/+acpi:* 		r,
-  @{run}/udev/data/+i2c:* 		r,
-  @{run}/udev/data/+backlight:* 	r,
-  @{run}/udev/data/+leds:* 		r,
-  @{run}/udev/data/n@{int} 		r,
-  @{run}/udev/data/+input:* 		r,
-  @{run}/udev/data/+dmi:* 		r,
-  @{run}/udev/data/+drm:* 		r,
-  @{run}/udev/data/+pci:* 		r,
-  @{run}/udev/data/+rfkill:*		r,
+  @{run}/udev/data/c@{int}:* r,
+  @{run}/udev/data/b@{int}:* r,
+  @{run}/udev/data/+sound:card@{int} r,
+  @{run}/udev/data/+bluetooth:*	r,
+  @{run}/udev/data/+platform:* r,
+  @{run}/udev/data/+acpi:* r,
+  @{run}/udev/data/+i2c:* r,
+  @{run}/udev/data/+backlight:* r,
+  @{run}/udev/data/+leds:* r,
+  @{run}/udev/data/n@{int} r,
+  @{run}/udev/data/+input:* r,
+  @{run}/udev/data/+dmi:* r,
+  @{run}/udev/data/+drm:* r,
+  @{run}/udev/data/+pci:* r,
+  @{run}/udev/data/+rfkill:* r,
 
-  @{sys}/bus/**/devices/   		r,   # ALL under /sys/bus/* is asked for read
-  @{sys}/class/**/		   	r,   # ALL but usbmisc under /sys/class is being read 
+  @{sys}/bus/**/devices/ r,   # ALL under /sys/bus/* is asked for read
+  @{sys}/class/** r,   # ALL but usbmisc under /sys/class is being read 
   @{sys}/devices/**/uevent r,
   @{sys}/devices/platform/**/uevent r,
   @{sys}/devices/platform/cpu/**/uevent r,
@@ -96,8 +86,8 @@ profile lxqt-config-input @{exec_pathlx9} {
   @{sys}/devices/LNXSYSTM:00/LNXSYBUS:@{rand2}/AMDI*/**/wakeup@{int}/uevent r,
   @{sys}/devices/LNXSYSTM:00/LNXSYBUS:@{rand2}/PNP*/uevent r,
   @{sys}/devices/LNXSYSTM:00/LNXSYBUS:@{rand2}/PNP*/**/wakeup/wakeup@{int}/uevent r,
-  
-  /dev/tty				rw,
+
+  /dev/tty rw,
 
   deny @{sys}/class/usbmisc/ r,
 
