@@ -1,0 +1,35 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathlx274} = @{bin}/lxqt-sudo 
+profile lxqt-sudo @{exec_pathlx274} {
+  include <abstractions/base>
+  include <abstractions/lxqt>
+  include <abstractions/bus-session>
+  include <abstractions/bus-accessibility>
+
+  signal (send) peer=sudo,
+
+  @{exec_pathlx274} mr,
+
+  @{bin}/sudo rPx,
+
+  /usr/share/icons/ r,
+  /usr/share/icons/{,**} r,
+
+  owner /tmp/@{int} r,
+
+  /dev/ptmx rw,
+  owner /dev/pts/@{int} rw,
+  /dev/tty rw,
+
+  include if exists <local/lxqt-sudo>
+}
+
+# vim:syntax=apparmor
