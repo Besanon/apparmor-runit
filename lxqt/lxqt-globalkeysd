@@ -10,33 +10,32 @@ include <tunables/global>
 @{exec_pathlx20} = @{bin}/lxqt-globalkeysd 
 profile lxqt-globalkeysd @{exec_pathlx20} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
+  include <abstractions/bus-accessibility>
   include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session>
-  include <abstractions/dbus-accessibility>
-  include <abstractions/gvfs-open>
-  
-  @{exec_pathlx20}				mr,
 
-  @{bin}/screengrab				rpx,
-  @{bin}/lxqt-config-brightness			rpx,
+  @{exec_pathlx20} mr,
 
-  /usr/share/lxqt/globalkeyshortcuts.conf 	rw,
+  @{open_path} rPx -> child-open-help,
 
-  /var/lib/dbus/machine-id  			r,
+  @{bin}/screengrab rpx,
+  @{bin}/lxqt-config-brightness	rpx,
 
-  owner @{user_config_dirs}/lxqt/               r,
+  /usr/share/lxqt/globalkeyshortcuts.conf rw,
+
+  /etc/machine-id r,
+
+  /var/lib/dbus/machine-id r,
+
+  owner @{user_config_dirs}/lxqt/ r,
+  owner @{user_config_dirs}/lxqt/#@{int} wr,
   owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.lock wrk,
-  owner @{user_config_dirs}/lxqt/#@{int}        wr,
   owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.@{rand6} rw,
   owner @{user_config_dirs}/lxqt/globalkeyshortcuts.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
 
-  /dev/tty					rw,
+  owner /tmp/@{int} r,
 
-  owner /tmp/@{int}  		       		r,
+  /dev/tty rw,
 
   include if exists <local/lxqt-globalkeysd>
 }
