@@ -10,19 +10,16 @@ include <tunables/global>
 @{exec_pathlx23} = @{bin}/lxqt-openssh-askpass
 profile lxqt-openssh-askpass @{exec_pathlx23} {
   include <abstractions/base>
-  include <abstractions/gtk>
   include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
-    
-  @{exec_pathlx23}		mr,
+  include <abstractions/bus-session>
+  include <abstractions/bus-accessibility>
 
-  owner /tmp/@{int}  		r,
+  @{exec_pathlx23} mr,
 
-  /dev/tty			rw,
+  owner /tmp/@{int} r,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-openssh-askpass>
 }
