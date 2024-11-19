@@ -11,33 +11,29 @@ include <tunables/global>
 profile lxqt-config-powermanagement @{exec_pathlx14} {
   include <abstractions/base>
   include <abstractions/bus-system>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
 
-  @{exec_pathlx14}				mr,
+  @{exec_pathlx14} mr,
 
-  owner @{user_config_dirs}/lxqt/#* rw,
+  /etc/machine-id r,
+
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
   owner @{user_config_dirs}/lxqt/lxqt-powermanagement.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-powermanagement.conf.@{rand6} rw,
-  owner @{user_config_dirs}/lxqt/lxqt-powermanagement.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#*,
-    
-  owner /tmp/@{int}  				r,
+  owner @{user_config_dirs}/lxqt/lxqt-powermanagement.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
 
-  @{sys}/class/backlight/ 			r,
-  @{sys}/devices/@{pci_bus}/**/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/*  rw,
-  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/  		 r,
-  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/max_brightness  	 r,
-  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/bl_power        	 r,
+  owner /tmp/@{int} r,
+
+  @{sys}/class/backlight/ r,
+  @{sys}/devices/@{pci_bus}/**/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/* rw,
+  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/ r,
+  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/max_brightness r,
+  @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/bl_power r,
   @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card@{int}/card@{int}-eDP-@{int}/intel_backlight/actual_brightness  r,
-  @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/card@{int}-eDP-1/amdgpu_bl@{int}/*  				 r,
-  
-  /dev/tty					rw,
+  @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/card@{int}-eDP-1/amdgpu_bl@{int}/* r,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-powermanagement>
 }
