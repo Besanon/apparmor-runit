@@ -10,11 +10,8 @@ include <tunables/global>
 @{exec_pathlx1} = @{bin}/lxqt-about
 profile lxqt-about @{exec_pathlx1} {
   include <abstractions/base>
-  include <abstractions/gtk>
   include <abstractions/lxqt>
-  include <abstractions/video>
-  include <abstractions/lxqt>
-      
+
   @{exec_pathlx1}			mr,
 
   /usr/share/icons/{,**}  		r,
@@ -22,9 +19,9 @@ profile lxqt-about @{exec_pathlx1} {
 
   /etc/xdg/menus/lxqt-applications.menu r,
 
-  /dev/tty				rw,
-
   owner /tmp/@{int}  			r,
+
+  /dev/tty				rw,
 
   include if exists <local/lxqt-about>
 }
