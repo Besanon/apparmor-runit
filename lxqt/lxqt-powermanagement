@@ -10,28 +10,26 @@ include <tunables/global>
 @{exec_pathlx266} = @{bin}/lxqt-powermanagement 
 profile lxqt-powermanagement @{exec_pathlx266} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
   include <abstractions/nameservice-strict>
-  include <abstractions/gvfs-open>
 
   network netlink raw,
 
-  @{exec_pathlx266}					mr,
+  @{exec_pathlx266} mr,
 
-  @{bin}/xset						rPx,
-  @{bin}/pkexec 					rPx,
-  @{bin}/{,ba,da}sh 					rix,
-  
-  /etc/udev/udev.conf 					r,
-  /etc/fstab 						r,
-  owner /tmp/@{int}  					r,
+  @{bin}/lxqt-config-powermanagement rPx,
+  @{bin}/xset rPx,
+  @{bin}/pkexec rPx,
+  @{bin}/lxqt-leave rPx,
+  @{bin}/{,ba,da}sh rix,
 
-  @{run}/systemd/inhibit/* 				rw,
+  /etc/udev/udev.conf r,
+  /etc/fstab r,
+  owner /tmp/@{int} r,
 
-  @{sys}/class/backlight/ 				r,
+  @{att}/@{run}/systemd/inhibit/@{int}.ref rw,
+
+  @{sys}/class/backlight/ r,
   @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/type r,
   @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/max_brightness r,
   @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/drm/card0/card0-eDP-1/amdgpu_bl0/bl_power r,
@@ -39,9 +37,11 @@ profile lxqt-powermanagement @{exec_pathlx266} flags=(attach_disconnected) {
   @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.4/usb5/uevent r,
   @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.4/usb5/5-2/uevent r,
 
-  owner @{PROC}/@{pid}/mounts                           r,
+  owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/mountinfo r,
 
-  /dev/tty						rw,  
+  /dev/tty rw,
+  owner /dev/tty@{int} rw,
 
   include if exists <local/lxqt-powermangement>
 }
