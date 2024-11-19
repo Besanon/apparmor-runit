@@ -7,64 +7,69 @@ abi <abi/4.0>,
 
 include <tunables/global>
 
-@{exec_pathLXI} = @{bin}/lximage-qt
-profile lximage-qt @{exec_pathLXI} {
+@{exec_pathlx22} = @{bin}/lximage-qt
+profile lximage-qt @{exec_pathlx22} {
   include <abstractions/base>
-  include <abstractions/gtk>
   include <abstractions/lxqt>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/fontconfig-cache-read>
-  include <abstractions/gvfs-open>
+  include <abstractions/bus-accessibility>
+  include <abstractions/fontconfig-cache-read> 
   include <abstractions/nameservice-strict>
   include <abstractions/user-read-strict>
   include <abstractions/user-write-strict>
+  include <abstractions/user-download-strict>
   include <abstractions/thumbnails-cache-read>
-  include <abstractions/trash-strict>
-      
-  @{exec_pathLXI}				mr,
-  @{lib}exec/menu-cache/menu-cached  		mr,
+
+  ptrace readby peer=dbus-accessibility,
+
+  @{exec_pathlx22} mr,
+
+  @{open_path} rPx -> child-open-help,
+
+  /etc/machine-id r,
+
+  @{lib}exec/menu-cache/menu-cached mr,
+  @{lib}/gconv/gconv-modules.cache r,
+  @{lib}/qt6/plugins/platforms/libqxcb.so mr,
+  @{lib}/qt6/plugins/platformthemes/libqtlxqt.so mr,
+  @{lib}/qt6/plugins/platforminputcontexts/libcomposeplatforminputcontextplugin.so mr,
+  @{lib}/qt6/plugins/{,**} r,
 
   /usr/share/icons/{,**}  r,
   /usr/share/desktop-directories/{,**} r,
   /usr/share/lximage-qt/translations/{,**} r,
   /usr/share/libfm-qt6/translations/libfm-qt_de.qm  r,
-  /usr/share/libfm-qt6/archivers.list r,
   /usr/share/thumbnailers/{,**} r,
   /usr/share/gvfs/remote-volume-monitors/ r,
   /usr/share/gvfs/remote-volume-monitors/udisks2.monitor r,
+  /usr/share/templates/ r,
 
-  /etc/fstab r,
-  /etc/nsswitch.conf r,
   /etc/xdg/menus/lxqt-applications.menu r,
-
-  owner @{HOME}/filename.config r,
 
   owner @{user_cache_dirs}/thumbnails/normal/** 	rwk,
   owner @{user_config_dirs}/#@{int} 			rwk,
   owner @{user_config_dirs}/QtProject.conf 		rw,
   owner @{user_config_dirs}/QtProject.conf.lock 	rwk, 
   owner @{user_config_dirs}/QtProject.conf.@{rand6} rwkl -> @{user_config_dirs}/#@{int}, 
-  owner @{user_config_dirs}/lximage-qt/#@{int}		rwk, 
+  owner @{user_config_dirs}/lximage-qt/ 		rw,
+  owner @{user_config_dirs}/lximage-qt/#@{int}	rw,
   owner @{user_config_dirs}/lximage-qt/settings.conf 	rw,
   owner @{user_config_dirs}/lximage-qt/settings.conf.lock rwk,
-  owner @{user_config_dirs}/lximage-qt/settings.conf.@{rand6} rw,
-  owner @{user_config_dirs}/lximage-qt/settings.conf.@{rand6} kl -> @{user_config_dirs}/lximage-qt/#@{int}, 
-  owner @{user_config_dirs}/lximage-qt/QtProject.conf.@{rand6}  rw,
-  owner @{user_config_dirs}/lximage-qt/QtProject.conf.@{rand6}  l -> @{user_config_dirs}/lximage-qt/#*,
+  owner @{user_config_dirs}/lximage-qt/settings.conf.@{rand6} rwk,
+  owner @{user_config_dirs}/lximage-qt/settings.conf.@{rand6} l -> @{user_config_dirs}/lximage-qt/#@{int},
+  owner @{user_config_dirs}/lximage-qt/QtProject.conf.@{rand6}  rwkl -> @{user_config_dirs}/lximage-qt/#@{int},
+  owner @{user_config_dirs}/lxqt-mimeapps.list  	r,
 
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
 
-  @{run}/mount/utab r,
+  @{sys}/devices/system/cpu/possible r,
+
+  owner @{HOME}/.xscreensaver r,
 
   owner /tmp/@{int}  				r,
-  owner /tmp/xauth_@{rand6} 			r,
+  owner /tmp/screenshot-@{rand8}.jpg rw,
 
   /dev/tty					rw,
-
-  deny owner @{HOME}/.* r,
-  deny owner @{HOME}/filename.config r,
 
   include if exists <local/lximage-qt>
 }
