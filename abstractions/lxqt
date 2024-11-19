@@ -24,5 +24,6 @@
   owner @{user_config_dirs}/lxqt/*.conf			rw,
 
   owner @{user_share_dirs}/sddm/xorg-session.log 	rw,
+  owner @{user_share_dirs}/sddm/wayland-session.log a,
 
 # vim:syntax=apparmor
