@@ -10,25 +10,19 @@ include <tunables/global>
 @{exec_pathlx3} = @{bin}/lxqt-admin-user
 profile lxqt-admin-user @{exec_pathlx3} {
   include <abstractions/base>
-  include <abstractions/gtk>
-  include <abstractions/video>
   include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
   include <abstractions/nameservice-strict>
-  
-  @{exec_pathlx3}			mr,
 
-  @{bin}/pkexec				rPx,
-  @{bin}/usermod 			rPx,
+  @{exec_pathlx3} mr,
 
-  /etc/shells 				r,
+  @{bin}/pkexec	rPx,
+  @{bin}/usermod rPx,
 
-  owner /tmp/@{int}             	r,
+  /etc/shells r,
 
-  /dev/tty				rw,
+  owner /tmp/@{int} r,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-admin-user>
 }
