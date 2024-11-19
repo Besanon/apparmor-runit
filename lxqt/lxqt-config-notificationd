@@ -10,27 +10,23 @@ include <tunables/global>
 @{exec_pathlx12} = @{bin}/lxqt-config-notificationd
 profile lxqt-config-notificationd @{exec_pathlx12} {
   include <abstractions/base>
-  include <abstractions/fonts>
   include <abstractions/lxqt>
-  include <abstractions/fontconfig-cache-read>
-  include <abstractions/graphics>
-  include <abstractions/mesa>
   include <abstractions/nameservice-strict>
-      
-  @{exec_pathlx12}			mr,
 
-  /etc/machine-id 			r,
+  @{exec_pathlx12} mr,
 
-  /var/lib/dbus/machine-id 		r,
+  /etc/machine-id r,
+
+  /var/lib/dbus/machine-id r,
 
   owner @{user_config_dirs}/lxqt/notifications.conf.lock  rwk,
-  owner @{user_config_dirs}/lxqt/#* rw,
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
   owner @{user_config_dirs}/lxqt/notifications.conf.@{rand6} rw,
-  owner @{user_config_dirs}/lxqt/notifications.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@*,
+  owner @{user_config_dirs}/lxqt/notifications.conf.@{rand6} l -> @{user_config_dirs}/lxqt/#@{int},
 
-  owner /tmp/#@{int}  			r,
-    
-  /dev/tty				 rw,
+  owner /tmp/#@{int} r,
+
+  /dev/tty rw,
 
   include if exists <local/lxqt-config-notificationd>
 }
