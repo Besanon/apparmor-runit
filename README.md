@@ -4,7 +4,7 @@ This repository tries to expand and adapt the achievements in apparmor policies 
 
 This attempt is still in early development. Runit so far can´t get completly confined up to now. Some parts already work and - your are invited to help fulfilling this gab if you wish to get a more secure linux with runit as base.
 
-In this repository only the altered profiles from the great work of Alexandre Pujol <alexandre@pujol.io> are shown. You will find some new profiles here. Theses profiles were developed using Void Linux (https://www.voidlinux.org). Runit has different implementations - they are still NOT reflected in this work. The profiles need the abstractions and tunables of the apparmor.d repositry from Alexandre Pujol. You will need them to get the profiles running.
+In this repository only the altered profiles from the great work of Alexandre Pujol <alexandre@pujol.io> are shown. You will find some new profiles here. Theses profiles were developed using Void Linux and Artix Linux. Runit has different implementations - they are still NOT fully reflected in this work. The profiles need the abstractions and tunables of the apparmor.d repositry from Alexandre Pujol. You will need them to get the profiles running.
 
 Use these profiles at your own risk and keep in mind that most of them will need some adaptation in some other environment.
 
