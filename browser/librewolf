@@ -59,6 +59,7 @@ profile librewolf @{exec_pathLF} flags=(attach_disconnected) {
   owner "@{user_config_dirs}/chromium/Local State" r,
 
   @{sys}/devices/@{pci}/ r,
+  @{sys}/fs/cgroup/@{int}/cpu.max r,
 
   profile librewolf-glxtest /usr/lib/librewolf*/glxtest {
     include <abstractions/base>
@@ -90,8 +91,6 @@ profile librewolf @{exec_pathLF} flags=(attach_disconnected) {
     include <abstractions/graphics>
     include <abstractions/nameservice-strict>
 
-    network netlink raw,
-
     /etc/libva.conf r,
     
     @{sys}/devices/pci[0-9]*/[0-9]*/{irq,resource} r,
@@ -101,14 +100,17 @@ profile librewolf @{exec_pathLF} flags=(attach_disconnected) {
     @{HOME}/.cache/librewolf/librewolf/*/startupCache/*.{bin,little} r,
     @{HOME}/.librewolf/librewolf/*/.parentlock w,
     owner @{HOME}/.librewolf/@{rand8}.default-default/.parentlock rw,
-    owner @{HOME}/.librewolf/vftdcqpe.default-default/extensions/skipredirect@sblask.xpi r,
-    owner @{HOME}/.librewolf/vftdcqpe.default-default/extensions/uBlock0@raymondhill.net.xpi r,
+    owner @{HOME}/.librewolf/**/extensions/skipredirect@sblask.xpi r,
+    owner @{HOME}/.librewolf/**/extensions/uBlock0@raymondhill.net.xpi r,
+    owner @{HOME}/.librewolf/**/extensions/*.xpi r, 
+
     @{HOME}/.librewolf/librewolf/*/gmp-gmpopenh264/{,**} r,
 
     owner @{user_cache_dirs}/librewolf/@{rand8}.default-default/{,**}  rw,
     owner @{user_share_dirs}/sddm/wayland-session.log a,
 
     owner /dev/tty@{int} rw,
+    /dev/tty@{int} rw,
 
     deny /etc/igfx* w,
     deny network netlink raw,
