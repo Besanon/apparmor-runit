@@ -2,7 +2,10 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
+  abi <abi/4.0>,
+
   include <abstractions/fonts>
+  include <abstractions/fontconfig-cache-write>
   include <abstractions/freedesktop.org>
   include <abstractions/gtk>
   include <abstractions/qt5>
@@ -10,20 +13,26 @@
   include <abstractions/X-strict>
   include <abstractions/xdg-desktop>
 
-  signal (receive) set=(kill, term) peer=lxqt-session,	
+  signal (receive) set=(kill, term) peer=lxqt-session,
 
-  /usr/share/hwdata/pnp.ids 				r,
-  /usr/share/icu/@{int}.@{int}/*.dat 			r,
-  /usr/share/lxqt/**    				r,
- 
-  owner @{HOME}/.Xdefaults 				r,
+  /usr/share/hwdata/pnp.ids r,
+  /usr/share/icu/@{int}.@{int}/*.dat r,
+  /usr/share/lxqt/** r,
 
-  owner @{user_cache_dirs}/fontconfig/* 		rw,
-  owner @{user_cache_dirs}/lxqt-notificationd/*  	r,
+  /etc/xdg/lxqt/*.conf rw,
 
-  owner @{user_config_dirs}/lxqt/*.conf			rw,
+  /var/lib/dbus/machine-id r,
 
-  owner @{user_share_dirs}/sddm/xorg-session.log 	rw,
-  owner @{user_share_dirs}/sddm/wayland-session.log a,
+  owner @{HOME}/.Xdefaults r,
+
+  owner @{user_config_dirs}/lxqt/*.conf rw,
+  owner @{user_config_dirs}/lxqt/lxqt.conf.lock rwk,
+
+  owner @{PROC}/@{pid}/cmdline r,
+
+  owner /dev/tty@{int} rw,
+  /dev/tty@{int} rw,
+
+  include if exists <abstractions/lxqt.d>
 
 # vim:syntax=apparmor
