@@ -53,19 +53,26 @@ profile lxqt-config-session @{exec_pathlx16} {
   owner @{user_config_dirs}/lxqt/#@{int} rwk,
   owner @{user_config_dirs}/lxqt/lxqt.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/lxqt-config-session.conf.lock rwk,
+  owner @{user_config_dirs}/lxqt/session.conf l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/session.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/session.conf.@{rand6} rwkl -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/windowmanagers.conf.lock rwk,
+  owner @{user_config_dirs}/lxqt/windowmanagers.conf l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/waylandwindowmanagers.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/waylandwindowmanagers.conf l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/QtProject.conf rw,
   owner @{user_config_dirs}/QtProject.conf.lock rwk,
   owner @{user_config_dirs}/QtProject.conf.@{rand6} rwkl -> @{user_config_dirs}/#@{int}, 
   owner @{user_config_dirs}/user-dirs.dirs rw,
+  owner @{user_config_dirs}/autostart/ rw,
+
+  owner @{HOME}/Desktop/ rw,
 
   owner /tmp/@{int} r,
 
   owner @{PROC}/@{pid}/mountinfo r,
 
+  owner /dev/tty@{int} rw,
   /dev/tty rw,
 
  include if exists <local/lxqt-config-session>
