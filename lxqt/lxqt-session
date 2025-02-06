@@ -10,42 +10,49 @@ include <tunables/global>
 @{exec_pathlsess} = @{bin}/lxqt-session
 profile lxqt-session @{exec_pathlsess} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/app-launcher-user>
+  include <abstractions/desktop>
+  include <abstractions/bus-session>
   include <abstractions/bus-accessibility>
-  include <abstractions/dconf>
-  include <abstractions/lxqt>
-  include <abstractions/qt5-shader-cache>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/app-launcher-user>
+  include <abstractions/graphics>
   include <abstractions/nameservice-strict>
+  include <abstractions/lxqt>
 
-  ptrace (read),
-
-  signal (send),
-  signal (receive) set=(kill, term) peer=startlxqt,
   signal (receive) set=(kill, term) peer=startlxqtwayland,
-  signal (receive) set=(kill, term) peer=sddm,
+  signal (send) set=(kill, term) peer=pcmanfm-qt,
+  signal (send) set=(kill, term) peer=lxqt*,
 
   network netlink raw,
+
+  #aa:dbus own bus=system name=org.lxqt.session  
 
   @{exec_pathlsess} mr,
 
   @{sh_path}                          rix,
+
   @{bin}/sed                          rix,
   @{bin}/readlink                     rix,
   @{bin}/dirname                      rix,
   @{bin}/system-config-printer-applet rPx,
   @{bin}/dbus-update-activation-environment rCx -> dbus,
+  @{bin}/dbus-daemon  rCx -> dbus,
   @{bin}/systemctl                    rCx -> systemctl,
 
   @{bin}/pavucontrol                  rPx,
   @{lib}/geoclue-2.0/demos/agent      rPx,
   @{bin}/nm-connection-editor         rPx,
+  @{bin}/qlipper                      rix,
   @{bin}/nm-applet                    rPx,
   @{bin}/openbox                      rix,
   @{bin}/dconf-editor                 rPx,
   @{bin}/setxkbmap                    rix,
   @{bin}/start-pulseaudio-x11         rPx,
   @{bin}/xrdb                         rPx,
+  @{bin}/labwc                        rPx,
   @{bin}/xdg-user-dirs-update         rPx,
+  @{bin}/wayfire		      rPx,
+  @{bin}/qt6ct			      rPx,
 
   /usr/share/                         r,
   /usr/share/mime/                    r,
@@ -55,14 +62,17 @@ profile lxqt-session @{exec_pathlsess} flags=(attach_disconnected) {
   /usr/share/system-config-printer/*  r,
 
   /etc/xdg/                           r,
+  /etc/xdg/lxqt/session.conf 	      r,
   /etc/xdg/autostart/                 r,
   /etc/xdg/autostart/*.desktop        r,
   /etc/xdg/menus/lxqt-*               r,
   /etc/xdg/openbox/*                  r,
   /etc/udev/udev.conf                 r,
 
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
   owner @{user_config_dirs}/autostart/ r,
   owner @{user_config_dirs}/autostart/*.desktop r,
+  owner @{user_config_dirs}/lxqt/power.conf.lock rw,
   owner @{user_cache_dirs}/openbox/   rw,
   owner @{user_cache_dirs}/openbox/sessions/          rw,
   owner @{user_cache_dirs}/openbox/openbox.log        rwk,
@@ -89,8 +99,12 @@ profile lxqt-session @{exec_pathlsess} flags=(attach_disconnected) {
   profile dbus flags=(attach_disconnected) {
     include <abstractions/base>
     include <abstractions/bus-session>
+    include <abstractions/nameservice-strict>
 
     @{bin}/dbus-update-activation-environment mr,
+    @{bin}/dbus-launch rPx,
+
+    owner @{PROC}/@{pid}/fdinfo/@{int} r,
 
     owner /dev/tty@{int}		  rw,
 
