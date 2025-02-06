@@ -10,9 +10,18 @@ include <tunables/global>
 @{exec_pathlx27} = @{bin}/lxqt-runner 
 profile lxqt-runner @{exec_pathlx27} flags=(attach_disconnected) {
   include <abstractions/base>
+  include <abstractions/bus-accessibility>
+  include <abstractions/bus-session>
+  include <abstractions/bus-system>
   include <abstractions/lxqt>
 
+  #aa:dbus own bus=system name=org.lxqt.lxqt-runner
+
   @{exec_pathlx27} mr,
+
+  @{bin}/dbus-update-activation-environment            rCx -> dbus,
+  @{bin}/dbus-launch            rCx -> dbus,
+  @{bin}/systemctl                                     rCx -> systemctl,
 
   /usr/share/icons/ r,
   /usr/share/desktop-directories/ r,
@@ -20,18 +29,46 @@ profile lxqt-runner @{exec_pathlx27} flags=(attach_disconnected) {
 
   /etc/xdg/menus/lxqt-applications.menu r,
 
+  /var/lib/dbus/machine-id r,
+
   owner @{user_config_dirs}/lxqt/lxqt-runner.conf.lock rwk,
   owner @{user_config_dirs}/lxqt/#@{int} rw,
+  owner @{user_config_dirs}/lxqt/panel.conf l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/lxqt-runner.conf l -> @{user_config_dirs}/lxqt/#@{int},
   owner @{user_config_dirs}/lxqt/lxqt-runner.conf.@{rand6} rwkl  -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/power.conf l -> @{user_config_dirs}/lxqt/#@{int},
+  owner @{user_config_dirs}/lxqt/power.conf.lock rwk,
 
   # only needed if tor is installed on /opt
   owner /opt/*/**/*.png  r,
 
+  owner @{PROC}/@{pid}/cmdline r,
+  @{PROC}/sys/kernel/random/boot_id r,
   owner /tmp/@{int} r,
 
   owner /dev/tty@{int} rw,
 
   /dev/tty rw,
+
+  profile systemctl flags=(attach_disconnected) {
+    include <abstractions/base>
+    include <abstractions/app/systemctl>
+
+    include if exists <local/xfce-session_systemctl>
+  }
+
+  profile dbus flags=(attach_disconnected) {
+    include <abstractions/base>
+    include <abstractions/bus-session>
+
+    @{bin}/dbus-update-activation-environment mr,
+    @{bin}/dbus-launch mr,
+    @{bin}/dbus-daemon rPx,
+
+    owner @{user_share_dirs}/sddm/xorg-session.log rw,
+
+    include if exists <local/lxqtrunner_dbus>
+  }
 
   include if exists <local/lxqt-runner>
 }
