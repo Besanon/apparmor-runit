@@ -1,0 +1,64 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2018-2021 Mikhail Morfikov
+# Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathvl} = @{bin}/metalog
+@{exec_pathvl} += @{bin}/socklog
+@{exec_pathvl} += @{bin}/svlogd
+profile socklog @{exec_pathvl} {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+
+  capability chown,  # For creating new log files and changing their owner/group
+  capability net_admin,  # For remote logs
+  capability setgid,  # For downgrading privileges
+  capability setuid,
+  capability fsetid,
+  capability fowner,
+  capability sys_nice,
+  capability syslog,
+
+  signal (receive) peer=runsv,
+
+  @{exec_pathvl} mr,
+
+  @{bin}/{,ba,da}sh rix,
+  @{bin}/sed rix,
+  @{bin}/syslog-stripdate rPx,
+
+  owner /etc/sv/socklog-unix/log/ r,
+  owner /etc/sv/socklog-unix/log/** rw,
+  /etc/runit/sv/dbus/log/ r,
+  /etc/runit/sv/acpid/log/ r,
+  /etc/metalog.conf rw,
+  /etc/runit/sv/openntpd/log/ rw,
+
+  owner /var/log/socklog/**/lock k,
+
+  /etc/CA/*.crt r,
+  /etc/CA/*.key r,
+
+  /var/log/** rw,
+  /var/log/dbus/lock k,
+  /var/log/acpid/lock k,
+  owner /var/log/socklog/everything/** rw,
+
+        @{run}/systemd/notify rw,
+  owner @{run}/systemd/journal/syslog w,
+	@{run}/metalog.pid rw,
+
+  @{PROC}/1/environ r,
+  @{PROC}/cmdline r,
+  @{PROC}/kmsg r,
+  @{PROC}/sys/kernel/osrelease r,
+
+  include if exists <local/socklog>
+}
+
+# vim:syntax=apparmor
