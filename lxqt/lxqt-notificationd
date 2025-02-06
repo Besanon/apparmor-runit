@@ -11,44 +11,56 @@ include <tunables/global>
 profile lxqt-notificationd @{exec_pathlx112} flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/bus-accessibility>
-  include <abstractions/lxqt>
+  include <abstractions/bus-session>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/graphics>
   include <abstractions/nameservice-strict>
+  include <abstractions/lxqt>
 
-  dbus receive
-  	bus=session
-  	path="/org/freedesktop/Notifications"
-  	interface="org.freedesktop.DBus.Introspectable"
-  	peer=(name=":[0-9]*.[0-9]*"),
-  dbus send
-  	bus=session
-  	path="/org/freedesktop/Notifications"
-  	interface="org.freedesktop.Notifications"
-  	peer=(name="org.freedesktop.DBus"),
-  dbus receive
-  	bus=session
-  	path="/org/freedesktop/Notifications"
-  	interface="org.freedesktop.Notifications"
-  	peer=(name=":[0-9]*.[0-9]*"),
+  #aa:dbus own bus=session name=org.freedesktop.Notifications
 
-   @{exec_pathlx112} mr,
+  @{exec_pathlx112} mr,
 
-   @{bin}/lxqt-config-notificationd rPx,
+  @{bin}/lxqt-config-notificationd rPx,
 
-   /etc/machine-id r,
+  @{bin}/dbus-launch rCx -> dbus,
 
-   owner @{user_cache_dirs}/lxqt-notificationd/	r,
-   owner @{user_cache_dirs}/lxqt-notificationd/#@{int} 	rwk,
-   owner @{user_cache_dirs}/lxqt-notificationd/unattended.list rw,
-   owner @{user_cache_dirs}/lxqt-notificationd/unattended.list.lock  rwk,
-   owner @{user_cache_dirs}/lxqt-notificationd/unattended.list.@{rand6} rwl -> @{user_cache_dirs}/lxqt-notificationd/#@{int},
+  /etc/machine-id r,
 
-   owner /tmp/@{int} r,
-   owner /tmp/falkon-@{rand6}/falkon_notif.png r,
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
 
-   /dev/tty rw,
-   owner /dev/tty@{int} rw,
+  owner @{user_cache_dirs}/lxqt-notificationd/	rw,
+#  owner @{user_cache_dirs}/lxqt-notificationd/#@{int}  rwkl,
+  owner @{user_cache_dirs}/lxqt-notificationd/unattended.list rw,
+  owner @{user_cache_dirs}/lxqt-notificationd/unattended.list rwl -> @{user_cache_dirs}/lxqt-notificationd/#@{int},
+  owner @{user_cache_dirs}/lxqt-notificationd/unattended.list.lock  rwk,
+  owner @{user_cache_dirs}/lxqt-notificationd/unattended.list.@{rand6} rwl -> @{user_cache_dirs}/lxqt-notificationd/*@{int},
 
-   include if exists <local/lxqt-notificationd>
+  owner @{user_config_dirs}/lxqt/notifications.conf.lock rw,
+
+  owner /tmp/@{int} r,
+  owner /tmp/falkon-@{rand6}/falkon_notif.png r,
+
+  owner @{PROC}/@{pid}/cmdline r,
+   
+  /dev/tty rw,
+  owner /dev/tty@{int} rw,
+
+  profile dbus flags=(attach_disconnected) {
+    include <abstractions/base>
+    include <abstractions/bus-accessibility>
+    include <abstractions/bus-session>
+
+    @{bin}/dbus-daemon rPx,
+    @{bin}/dbus-launch rix,
+
+    /usr/share/dbus-1/session.conf r,
+
+    owner /dev/tty@{int}		  rw,
+
+    include if exists <local/lxqt-session_dbus>
+  }
+  include if exists <local/lxqt-notificationd>
 }
 
 # vim:syntax=apparmor
