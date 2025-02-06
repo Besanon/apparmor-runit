@@ -10,40 +10,49 @@ include <tunables/global>
 @{exec_pathgal} = @{bin}/galculator
 profile galculator @{exec_pathgal} {
   include <abstractions/base>
-  include <abstractions/app/open>
+  include <abstractions/bus-accessibility>
   include <abstractions/consoles>
+  include <abstractions/dconf-write>
   include <abstractions/freedesktop.org>
   include <abstractions/fonts>
-  include <abstractions/gtk>
   include <abstractions/graphics>
-  include <abstractions/qt5>
-  include <abstractions/X>
-  include <abstractions/dbus-session-strict>
-  include <abstractions/dbus-accessibility-strict>
-  include <abstractions/gvfs-open>
+  include <abstractions/gtk>
+  include <abstractions/X-strict>
   
   signal (read) set=(kill,term) peer=lxqt-session,
 
   @{exec_pathgal}				mr,  
+
+  /etc/pulse/client.conf 			r,
+  /etc/machine-id r,
   
+  /usr/share/sounds/freedesktop/index.theme     r,
   /usr/share/galculator/{,**}			r,
 
-   owner @{HOME}/.Xdefaults r,
+  /var/cache/fontconfig/ rw,
   
   owner @{user_config_dirs}/galculator/		rw,
   owner @{user_config_dirs}/galculator/*	rwk,
-  owner @{user_config_dirs}/ibus/bus/ 		r,
-  owner @{user_config_dirs}/ibus/bus/{,**}	r,
+  owner @{user_config_dirs}/pulse/cookie 	rwk,
+
+  owner @{user_cache_dirs}/event-sound-cache.tdb.@{hex32}.@{multiarch} rwk,
+  owner @{user_cache_dirs}/event-sound-cache.tdb.host.@{arch}-pc-linux-gnu rwk,
+
+  owner @{user_share_dirs}/sddm/wayland-session.log a,
 
   @{PROC}/@{pid}/fd/				r,	
 
-  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/vendor r,
-  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/device r,
-  @{sys}/devices/@{pci_bus}/0000:00:08.1/0000:05:00.0/uevent r,
+  @{sys}/devices/@{pci}/vendor  		r,
+  @{sys}/devices/@{pci}/vice  			r,
+  @{sys}/devices/@{pci}/uevent  		r,
+  @{sys}/devices/@{pci}/revision 		r,
+  @{sys}/devices/@{pci}/subsystem_vendor 	r,
+  @{sys}/devices/@{pci}/subsystem_device 	r,
 
-  owner /tmp/xauth_@{rand6}			rw,
+  owner @{run}/user/@{uid}/pulse/ 		rw,
 
-  /dev/udmabuf 					rw,
+  /dev/shm/ 					r,
+  owner /dev/shm/wlroots-@{rand6} rw,
 
   include if exists <local/galculator>
 }
