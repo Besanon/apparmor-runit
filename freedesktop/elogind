@@ -3,11 +3,11 @@
 # Copyright (C) 2024 Besanon <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/4.0>,
+abi <abi/3.0>,
 
 include <tunables/global>
 
-@{exec_pathelog} = /usr/libexec/elogind/elogind
+@{exec_pathelog} = /usr/lib/elogind/elogind
 profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/bus-system>
@@ -26,13 +26,17 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   capability sys_tty_config,
   capability net_bind_service,
   capability mknod,
+  capability audit_write,
+  deny capability net_admin,
 
   network netlink raw,
 
   ptrace (read) peer=runsvdir,
   ptrace (read) peer=runsv,
   ptrace (read) peer=login,
-  ptrace (read) peer=kde-powerdevil,
+  ptrace (read) peer=sddm,
+  ptrace (read) peer=labwc,
+  ptrace (read) peer=wayfire,
   ptrace (read) peer=kwin_wayland,
   ptrace (read) peer=sddm,
   ptrace (read) peer=lxqt-session,
@@ -41,7 +45,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
 
   signal (send) set=(cont) peer=@{p_systemd},
   signal (send) set=(term hup kill) peer=sddm,  
-  signal (receive) set=(term, cont) peer=runsv,  
+  signal (receive) peer=runsv,  
 
   dbus send bus=system path=/org/freedesktop/resolve1
        interface=org.freedesktop.resolve1.Manager
@@ -56,7 +60,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   @{exec_pathelog} mrix,
 
   @{bin}/halt rix,
-  @{bin}/runit-init rPx,
+  @{bin}/runit-init rix,
   @{bin}/elogind-inhibit   rix, 
   /usr/libexec/elogind/elogind/elogind.wrapper   rpx,
   /usr/libexec/elogind/elogind/elogind-cgroups-agent rix,
@@ -79,6 +83,10 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   @{etc_ro}/pwdb.conf              r,
   owner /etc/elogind/logind.conf   r,
   owner /etc/runit/reboot 	   rw,
+  /etc/elogind/sleep.conf.d/ r,
+  /etc/elogind/sleep.conf.d/*.conf r,
+  /etc/elogind/logind.conf.d/ r,
+  /etc/elogind/logind.conf.d/*.conf r,
 
   /{usr/,}lib{,32,64}/security/pam_filter/*       mr,
   /{usr/,}lib{,32,64}/security/pam_*.so      	  mr,
@@ -87,14 +95,11 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   /{usr/,}lib/@{multiarch}/security/pam_*.so      mr,
   /{usr/,}lib/@{multiarch}/security/              r,
 
-  # gssapi
   @{etc_ro}/gss/mech               r,
   @{etc_ro}/gss/mech.d/            r,
   @{etc_ro}/gss/mech.d/*.conf      r,
 
-  # kerberos
   include <abstractions/kerberosclient>
-  # SuSE's pwdutils are different:
   @{etc_ro}/default/passwd         r,
   @{etc_ro}/login.defs             r,
   @{etc_ro}/login.defs.d/          r,
@@ -159,6 +164,7 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   @{run}/user/@{uid}/ r,
 
   owner @{sys}/firmware/efi/efivars/OsIndicationsSupported-@{uuid} r,
+  owner @{sys}/firmware/efi/efivars/OsIndications-@{uuid} r,
   owner @{sys}/fs/cgroup/elogind/cgroup.procs rw,
   owner @{sys}/fs/cgroup/memory/** rw,
   owner @{sys}/fs/cgroup/elogind/ rw,
@@ -172,19 +178,43 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner @{sys}/class/drm/ r,
   owner @{sys}/devices/@{pci_bus}/**/**/drm/card@{int}/** r,
   owner @{sys}/devices/@{pci_bus}/**/**/**/drm/card@{int}/uevent r,
+  owner @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card0/card0-DP-@{int}/enabled r, 
+  owner @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card0/card0-HDMI-A-1/enabled r,
   owner @{sys}/devices/@{pci_bus}/**/drm/card@{int}/card@{int}-*/uevent r,
   owner @{sys}/devices/LNXSYSTM:00/LNX{SYBUS,PWRBN}:00/** r,
   owner @{sys}/devices/@{pci_bus}/**/**/sound/card@{int}/**/uevent r,
   owner @{sys}/devices/@{pci_bus}/**/**/{usb,ata}@{int}/**  r,
+  owner @{sys}/devices/@{pci_bus}/0000:00:*.0/usb1/1-5/1-5:*/video4linux/video@{int}/uevent r,
+  owner @{sys}/devices/@{pci_bus}/0000:00:*.0/usb1/1-5/1-5:*/media0/uevent r,
+  owner @{sys}/devices/@{pci_bus}/0000:00:02.0/drm/card0/uevent r,
   owner @{sys}/devices/platform/i8042/serio@{int}/input/input@{int}/** r,
   owner @{sys}/devices/platform/asus-nb-*/input/input@{int}/** r,
   owner @{sys}/devices/platform/pcspkr/** r, 
   owner @{sys}/devices/platform/ACPI000@{int}:0@{int}/power_supply/AC/* r, 
+  owner @{sys}/devices/@{pci_bus}/0000:00:*.0/ACPI0003:00/power_supply/ACAD/type r,
+  owner @{sys}/devices/@{pci_bus}/0000:00:*.0/ACPI0003:00/power_supply/ACAD/online r,
   owner @{sys}/devices/virtual/tty/tty0/active r,
   owner @{sys}/devices/virtual/misc/rfkill/uevent r,
   owner @{sys}/devices/virtual/sound/**/uevent r,
   owner @{sys}/devices/virtual/input/input@{int}/event@{int}/uevent r,
+  @{sys}/devices/{,**} r,
 
+  @{sys}/fs/cgroup/ rw,
+  @{sys}/fs/cgroup/cgroup.controllers r,
+  @{sys}/devices/@{pci}/drm/card1/uevent r,
+  @{sys}/fs/cgroup/c@{int}/ rw,
+  @{sys}/fs/cgroup/@{int}/ rw,
+  @{sys}/fs/cgroup/c@{int}/cgroup.procs rw,
+  @{sys}/fs/cgroup/@{int}/cgroup.procs rw,
+  @{sys}/power/mem_sleep r,
+  @{sys}/devices/virtual/input/input@{int}/uevent r,  
+  @{sys}/devices/@{pci}/drm/card1/card1-DP-@{int}/enabled  r,
+  @{sys}/devices/@{pci}/drm/card1/card1-HDMI-A-1/enabled r,
+  @{sys}/devices/@{pci}/usb1/1-2/1-2@{busname}/0003:046D:C05A.0001/input/input4/event4/uevent r,
+  @{sys}/devices/@{pci}/usb1/1-2/1-2@{busname}/0003:046D:C05A.0001/input/input4/uevent r,
+  @{sys}/devices/@{pci}/i2c_designware.0/i2c-14/i2c-ELAN0709:00/0018:04F3:31BF.0002/input/**/**/uevent r,
+  @{sys}/devices/@{pci}/i2c_designware.0/i2c-15/i2c-ELAN0709:00/0018:04F3:31BF.0002/input/**/uevent r,
+ 
   owner @{PROC}/@{pid}/cmdline r,
   owner @{PROC}/@{pid}/comm r,
   owner @{PROC}/@{pid}/sessionid r,
@@ -193,13 +223,19 @@ profile elogind @{exec_pathelog} flags=(attach_disconnected) {
   owner @{PROC}/sysvipc/msg r,
   @{PROC}/@{pid}/stat r,
   @{PROC}/@{pid}/cgroup  r,
-
+  @{PROC}/pressure/cpu r,
+  @{PROC}/pressure/io r,
+  @{PROC}/pressure/memory r,
+  @{PROC}/@{pid}/fdinfo/@{int} r,
+  
   owner /dev/shm/		r,
   owner /dev/input/event@{int}  rw,
   owner /dev/dri/card@{int} rw,
   owner /dev/tty@{int} rw,
         /dev/tty@{int} rw,
+	 /dev/dri/card@{int} rw,
 
+  deny @{run}/user/@{uid}/.flatpak/ r,
   deny @{run}/user/@{uid}/webkitgtk/ r,
 
   include if exists <local/elogind>
