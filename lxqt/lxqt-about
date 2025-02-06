@@ -27,4 +27,3 @@ profile lxqt-about @{exec_pathlx1} {
 }
 
 # vim:syntax=apparmor
-
