@@ -61,6 +61,7 @@ profile lximage-qt @{exec_pathlx22} {
 
   owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/mounts r,
+  owner @{PROC}/@{pid}/cmdline r,
 
   @{sys}/devices/system/cpu/possible r,
 
