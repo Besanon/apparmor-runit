@@ -21,6 +21,8 @@ profile xdg-desktop-portal-lxqt @{exec_pathZ} {
   network inet6 stream,
   network netlink raw,
 
+  #aa:exec kioworker
+
   @{exec_pathZ} mr,
 
   owner @{desktop_config_dirs}/user-dirs.dirs r,
