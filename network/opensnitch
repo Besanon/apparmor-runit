@@ -13,9 +13,11 @@ profile opensnitchd @{exec_pathtz7o} {
   include <abstractions/base>
   include <abstractions/bus-accessibility>
   include <abstractions/consoles>
+  include <abstractions/dri>
   include <abstractions/python>
   include <abstractions/fonts>
   include <abstractions/fontconfig-cache-read>
+  include <abstractions/graphics>
   include <abstractions/nameservice-strict>
   include <abstractions/X-strict>
 
@@ -78,8 +80,12 @@ profile opensnitchd @{exec_pathtz7o} {
   owner /etc/opensnitchd/{,**} rw,
 
   /var/lib/ebtables/lock rwk,
+  /var/lib/dbus/machine-id r,
 
   owner /var/log/opensnitchd.log rw,
+
+  owner @{HOME}/.Xdefaults r,
+  owner @{HOME}/.icons/default/index.theme r,
 
   owner @{user_config_dirs}/autostart/opensnitch_ui.desktop rw,
   owner @{user_config_dirs}/opensnitch/#@{int} rwk,
@@ -137,6 +143,7 @@ profile opensnitchd @{exec_pathtz7o} {
   @{sys}/devices/@{pci}/subsystem_device r,
 
   /dev/dri/renderD128 rw,
+  owner /dev/tty@{int} rw,
 
   include if exists <local/opensnitch>
 }
