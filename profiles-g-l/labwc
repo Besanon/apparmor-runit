@@ -10,32 +10,32 @@ include <tunables/global>
 @{exec_pathlabwc} = @{bin}/labwc
 profile labwc @{exec_pathlabwc} flags=(attach_disconnected) {
   include <abstractions/base>
-  include <abstractions/dri>
-  include <abstractions/app-launcher-user>
-  include <abstractions/fontconfig-cache-write>
+  include <abstractions/consoles>
+  include <abstractions/desktop>
+  include <abstractions/devices-usb>
+  include <abstractions/fontconfig-cache-read>
   include <abstractions/graphics>
-  include <abstractions/lxqt>
   include <abstractions/nameservice-strict>
-  include <abstractions/qt5-shader-cache>
-
-  signal (receive) set=term peer=sddm,
-
-  capability sys_nice,
-  capability sys_ptrace,
-
-  ptrace (read),
 
   network netlink raw,
 
   @{exec_pathlabwc} mr,
 
+  # Apps allowed to run
+  @{bin}/* rPUx,
+  @{lib}/* rPUx,
+
   /usr/share/libinput/ r,
   /usr/share/libinput/* r,
 
-  owner @{user_config_dirs}/labwc/{,**} rw,
-  owner @{user_config_dirs}/lxqt/wayland/ rw,
-
-  owner @{user_share_dirs}/sddm/wayland-session.log rw,
+  @{user_config_dirs}/labwc/* r,
+  owner @{user_config_dirs}/labwc/* r,
+  owner @{user_config_dirs}/lxqt/ r,
+  @{user_config_dirs}/lxqt/ r,
+  owner @{user_config_dirs}/lxqt/* r,
+  @{user_config_dirs}/lxqt/* r,
+  owner @{user_config_dirs}/lxqt/wayland/* rw,
+  @{user_config_dirs}/lxqt/wayland/* rw,
 
   @{run}/systemd/sessions/*.ref rw,
   @{run}/systemd/sessions/@{int} r,
@@ -54,7 +54,7 @@ profile labwc @{exec_pathlabwc} flags=(attach_disconnected) {
   @{run}/udev/data/+drm:* 		r,
   @{run}/udev/data/+pci:* 		r,
   @{run}/udev/data/+rfkill:*		r,
-  @{run}/udev/data/+usb@{busname}@{busname} r,
+  @{run}/udev/data/+usb* r,
 
   @{sys}/bus/ r,
   @{sys}/bus/**/devices/   		r,   # ALL under /sys/bus/* is asked for read
@@ -97,20 +97,20 @@ profile labwc @{exec_pathlabwc} flags=(attach_disconnected) {
   @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/session-2.scope/cpu.max r,
   @{sys}/fs/cgroup/user.slice/user-@{uid}.slice/cpu.max r,
   @{sys}/fs/cgroup/user.slice/cpu.max r,
+  @{sys}/fs/cgroup/@{int}/cpu.max r,
 
+  @{run}/systemd/sessions/* r,
+  @{run}/systemd/seats/seat@{int} r,
+
+  owner @{PROC}/@{pid}/fd/ r,
+  owner @{PROC}/@{pid}/mountinfo r,
   owner @{PROC}/@{pid}/cgroup r,
 
   /dev/input/event@{int} rw,
-  /dev/dri/card@{int} rw,
   /dev/tty@{int} rw,
   owner /dev/shm/wlroots-@{rand6} rw,
 
-  deny capability sys_admin,
-  deny capability sys_chroot,
-  deny capability net_admin,
-
   include if exists <local/labwc>
-
 }
 
 # vim:syntax=apparmor
