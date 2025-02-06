@@ -38,6 +38,14 @@ profile runsvdir @{exec_pathrunsvdir} flags=(attach_disconnected) {
   /etc/sv/**/finish  	 rix,
   /etc/sv/**/run  	 rix,
   /etc/sv/dbus/check 	 rix,
+  /etc/runit/sv/**/run  	 rix,   # for ARTIX
+  /etc/runit/sv/**/**/run  	 rix,   # rix,
+  /etc/runit/sv/**/finish  	 rix,   # rix,
+  /etc/runit/sv/**/run  	 rix,   # rix,
+  /etc/runit/sv/dbus/check 	 rix,   # rix,
+  /etc/ssl/certs/ca-certificates.crt r,
+  /etc/runit/runsvdir/default/supervise/supervise/lock k,
+  /etc/runit/runsvdir/default/supervise/lock k,
 
   owner / 			r,
 
