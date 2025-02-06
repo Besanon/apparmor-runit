@@ -1,0 +1,27 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathw3qml} = @{lib}/webkitgtk-6.0/WebKitWebProcess
+@{exec_pathw3qml} += @{lib}/webkit2gtk-4.1/WebKitWebProcess
+@{exec_pathw3qml} += @{lib}/webkit2gtk-4.0/WebKitWebProcess
+profile WebKitWebProcess @{exec_pathw3qml} {
+  include <abstractions/base>
+  include <abstractions/qt5>
+
+  @{exec_pathw3qml} mr,
+
+  deny capability sys_admin,
+  deny capability sys_chroot,
+  deny capability net_admin,
+
+  include if exists <local/WebKitWebProcess>
+
+}
+
+# vim:syntax=apparmor
