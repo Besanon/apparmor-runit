@@ -16,9 +16,14 @@ profile lxqt-leave @{exec_pathlx21} {
 
   @{bin}/xdg-screensaver rPx,
 
+  owner @{user_config_dirs}/lxqt/#@{int} rw,
+
+  owner @{PROC}/@{pid}/cmdline r,
+
   owner /tmp/@{int} r,
 
   /dev/tty rw,
+  owner /dev/tty@{int} rw,
 
   include if exists <local/lxqt-leave>
 }
