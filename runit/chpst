@@ -3,13 +3,14 @@
 # Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/4.0>,
+abi <abi/3.0>,
 
 include <tunables/global>
 
 @{exec_pathCHP} = /sbin/chpst @{bin}/chpst
 profile chpst @{exec_pathCHP} {
   include <abstractions/base>
+  include <abstractions/nameservice-strict>
   include <abstractions/devices-usb>
 
   network inet stream,
@@ -18,11 +19,20 @@ profile chpst @{exec_pathCHP} {
   network netlink raw,
   network packet dgram,
 
+  capability setgid,
+  capability setuid,
+  capability fsetid,
+
+  signal (receive)  peer=runsv,
+
   @{exec_pathCHP} 	mr,
 
   @{bin}/agetty		rPx,
   @{bin}/pause 		rPx,
   @{bin}/stubby		rix,
+  @{bin}/socklog 	rix,
+
+  include if exists <local/chpst>
 }
 
 # vim:syntax=apparmor
