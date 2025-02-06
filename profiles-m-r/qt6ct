@@ -1,0 +1,57 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathqt6ct} = @{bin}/qt6ct
+profile qt6ct @{exec_pathqt6ct} {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/fontconfig-cache-read>
+  include <abstractions/qt5>
+
+  @{exec_pathqt6ct} mr,
+
+  @{lib}/libqt6ct-common.* mr,
+
+  /usr/share/qt6ct/{,**} r,
+  /usr/share/themes/{,**} r,
+  /usr/share/icons/{,**} r,
+  /usr/share/mime/{,**} r,
+  /usr/share/pixmaps/{,**} r,
+  /usr/share/gtk-@{int}.0/{,**} r,
+  /usr/share/lxqt/*.conf r,
+
+  /etc/xdg/lxqt/*.conf r,
+
+  /var/lib/dbus/machine-id r,
+
+  owner @{HOME}/ r,
+  owner @{HOME}/.gtkrc-2.0 r,
+  owner @{HOME}/.Xdefaults r,
+  owner @{HOME}/.icons/{,**} r,
+
+  owner @{user_config_dirs}/qt6ct/{,**} rw,
+  owner @{user_config_dirs}/qt6ct/qt6ct.conf.lock rwk,
+  owner @{user_config_dirs}/qt6ct/qt6ct.conf.@{rand6} l -> @{user_config_dirs}/qt6ct/#@{int},
+  owner @{user_config_dirs}/lxqt/*.conf r,
+
+  owner @{PROC}/@{pid}/cmdline r,
+  @{PROC}/sys/kernel/random/boot_id r,
+  
+  owner /dev/shm/wlroots-@{rand6} r,
+  owner /dev/tty@{int}  rw,
+
+  deny capability sys_admin,
+  deny capability sys_chroot,
+  deny capability net_admin,
+
+  include if exists <local/qt6ct>
+
+}
+
+# vim:syntax=apparmor
