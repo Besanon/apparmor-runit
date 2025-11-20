@@ -1,0 +1,41 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2019-2022 Mikhail Morfikov
+# Copyright (C) 2022-2024 Alexandre Pujol <alexandre@pujol.io>
+# Besanon
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+@{exec_pathLSU} = @{bin}/lxsu
+profile lxsu @{exec_pathLSU} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/app-launcher-root>
+  include <abstractions/app/sudo>
+#  include <mappings/sudo>  #aa:only RBAC
+
+  capability chown,  # pseudo-terminal
+
+  signal send    set=(term kill),
+  signal receive set=(int  quit term),
+  signal receive set=(cont hup)       peer=sudo,
+
+  @{exec_pathLSU} mr,
+
+  @{bin}/@{shells}     Ux,
+  @{sbin}/nologin      Px,
+
+  @{etc_ro}/default/su r,
+  /etc/default/locale r,
+  /etc/environment r,
+
+  @{HOME}/.xauth@{rand6} rw,
+
+  @{run}/systemd/sessions/*.ref w,
+
+  include if exists <local/lxsu>
+}
+
+# vim:syntax=apparmor
+
