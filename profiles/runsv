@@ -1,0 +1,137 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathrunsv} = @{bin}/runsv
+profile runsv @{exec_pathrunsv} flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/bus-session>
+  include <abstractions/bus-system>
+  include <abstractions/bus/org.freedesktop.login1>
+  include <abstractions/nameservice-strict>
+
+  capability fsetid,
+  capability fowner,
+  capability mknod,
+  capability chown,
+  capability setgid,
+  capability setpcap,
+  capability setuid,
+  capability sys_time,
+  capability sys_tty_config,
+  capability fowner,
+  capability kill,
+
+  signal (send),
+  signal (receive),
+
+  ptrace (read) peer=elogind,  
+  ptrace (read) peer=@{p_systemd},  
+  ptrace (trace) peer=@{profile_name},
+
+  network inet stream,
+
+  @{exec_pathrunsv} 	 mr,
+  
+  @{bin}/systemctl       rCx -> systemctl,
+  @{bin}/**		 PUx,
+  @{lib}/**		 PUx,
+  /usr/share/*/**	 PUx,
+
+  # for VOID
+  /etc/sv/**/run  	 rix,   # rix,
+  /etc/sv/**/**/run  	 rix,   # rix,
+  /etc/sv/**/finish  	 rix,   # rix,
+  /etc/sv/**/run  	 rix,   # rix,
+  /etc/sv/dbus/check 	 rix,   # rix,
+
+  # for ARTIX
+  /etc/runit/sv/**/run  	 rix,   # rix,
+  /etc/runit/sv/**/**/run  	 rix,   # rix,
+  /etc/runit/sv/**/finish  	 rix,   # rix,
+  /etc/runit/sv/**/run  	 rix,   # rix,
+  /etc/runit/sv/dbus/check 	 rix,   # rix,
+  /etc/runit/runsvdir/default/supervise/supervise/lock k,
+  /etc/runit/runsvdir/default/supervise/lock k,
+
+  /etc/ssl/certs/ca-certificates.crt r,
+
+  mount fstype=tmpfs ->   @{run}/systemd/,
+  mount fstype=tmpfs ->   @{run}/user/,
+  mount fstype=cgroup ->  @{sys}/fs/cgroup/elogind/,
+  umount  @{run}/systemd/ ,
+  umount  @{run}/user/ ,
+  umount  @{sys}/fs/cgroup/elogind/ ,
+
+  # for VOID
+  /etc/sv/ 		r,
+  /etc/sv/** 		rw,
+  /etc/runit/ 		r, 
+  /etc/runit/** 	rw, 
+
+  # for ARTIX
+  /etc/runit/sv/ 		r,
+  /etc/runit/sv/** 		rw,
+  /etc/runit/ 		r, 
+  /etc/runit/** 	rw, 
+  /etc/runit/sv/**/supervise/lock k,
+  /etc/runit/runsvdir/default/supervise/supervise/lock k,
+  /etc/runit/runsvdir/default/supervise/lock k,
+
+  @{run}/ 		rw,
+  @{run}/*/ 		rw,
+  @{run}/*/* 		rw,
+  @{run}/auditd.pid 	r,
+  @{run}/credentials/{,**} rw,
+  @{run}/initctl 	rw,
+  @{run}/systemd/{,**}  rw,
+
+  @{run}/udev/data/+module:configfs r,
+  @{run}/udev/data/+module:fuse r,
+  @{run}/udev/data/c4:@{int} r,           # For TTY devices
+  @{run}/udev/data/c10:@{int}   r,        # For non-serial mice, misc features
+  @{run}/udev/data/c116:@{int} r,         # For ALSA
+  @{run}/udev/data/c@{dynamic}:@{int} r,  # For dynamic assignment range 234 to 254, 384 to 511
+  @{run}/udev/data/n@{int} r,
+  @{run}/runit/** rw,
+  @{run}/udev/control rw,
+
+  owner @{run}/user/@{uid}/ r,
+  owner @{run}/user/@{uid}/#@{int} rw,
+  owner @{run}/runit/supervise.*/** rwk,
+  owner @{run}/runit/supervise.*/**/** rwk,
+  owner @{run}/dhcpcd/  rw,
+  owner @{run}/elogind.pid rwk,
+  owner @{run}/utmp rwk,
+
+  @{sys}/fs/cgroup/{,**} rw,
+
+        @{PROC}/@{pid}/cgroup r,
+        @{PROC}/@{pid}/fd/ r,
+        @{PROC}/@{pid}/mountinfo r,
+        @{PROC}/@{pid}/uid_map rw,
+        @{PROC}/sys/fs/binfmt_misc/ r,
+
+  owner /var/log/audit/** rw,
+  owner /var/log/audit/**/** rw,
+  owner /var/log/socklog/ r,
+
+  /dev/console rw,
+  owner /dev/tty@{int} rw,
+  /dev/tty rw,
+  /dev/tty@{int} rw,
+
+  profile systemctl {
+    include <abstractions/base>
+    include <abstractions/app/systemctl>
+  
+  }
+
+  include if exists <local/runsv>
+}
+
+# vim:syntax=apparmor
