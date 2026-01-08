@@ -1,0 +1,67 @@
+# apparmor.d - Full set of apparmor profiles
+# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# SPDX-License-Identifier: GPL-2.0-only
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+@{exec_pathruni} = @{bin}/runit-init /sbin/runit-init @{bin}/runit /sbin/runit
+profile runit-init @{exec_pathruni} {
+  include <abstractions/base>
+
+  signal (send) set=(cont) peer=@{p_systemd},
+  signal (receive) set=(term, hup, cont),
+  signal (send),
+
+  capability dac_override,
+
+  ptrace (read, readby),
+
+  unix (send) type=dgram,
+
+  dbus send bus=system path=/org/freedesktop/DBus
+       interface=org.freedesktop.DBus
+       member=GetConnectionUnixUser
+       peer=(name=org.freedesktop.DBus, label=dbus-system),
+
+  /sbin/runit-init			mr,
+  @{bin}/runit-init			mr,
+  /sbin/runit				Px,
+  @{bin}/runit				Px,
+
+  /etc/runit/1		          	mr,    
+  /etc/runit/2          		mr,  
+  /etc/runit/3          		mr,  
+  /etc/runit/ctrlaltdel 		mr,  
+  /etc/runit/core-services/*		mr,  
+  /etc/runit/shutdown.d/*		mr,
+  @{bin}/sv             		rPx,
+  @{bin}/runsv                          rPx,
+  @{bin}/runsvdir                       rPx,
+  @{bin}/runsvchdir                     rPx,
+  /etc/rc.shutdown      		rPx,  
+  /etc/rc.local                         rPx,  
+  @{bin}/systemctl                  	rPx,
+
+  @{bin}/ldconfig                   	rPx,
+  @{bin}/mandb                      	rPx,
+  @{bin}/savelog                    	rPx,
+
+  owner /etc/runit/functions     	r,
+  owner /etc/runit/runsvdir/default/ 	r,
+  owner /etc/rc.conf             	r,
+  owner /etc/runit/shutdown.d/   	r,
+  owner /etc/runit/stopit        	rw,
+  owner /etc/runit/reboot        	rw,
+
+  owner /run/runit/stopit        	rw,
+  owner /run/runit/reboot        	rw,
+
+  /dev/pts/@{int}  			rw,
+  owner /dev/tty@{int}			rw,
+
+  include if exists <local/runit-init>
+}
+
+# vim:syntax=apparmor
