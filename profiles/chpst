@@ -1,15 +1,15 @@
 # apparmor.d - Full set of apparmor profiles
 # Copyright (C) 2022 Alexandre Pujol <alexandre@pujol.io>
-# Copyright (C) 2024 Besanon  <m231009ts@mailfence.com>
+# Copyright (C) 2024 Besanon  <set508@proton.me>
 # SPDX-License-Identifier: GPL-2.0-only
 
-abi <abi/3.0>,
+abi <abi/4.0>,
 
 include <tunables/global>
 
-@{exec_pathCHP} = /sbin/chpst @{bin}/chpst
-profile chpst @{exec_pathCHP} {
-  include <abstractions/base>
+@{exec_path} = /sbin/chpst @{bin}/chpst
+profile chpst  /{,usr/}{,s}bin/chpst {
+  include <abstractions/base-strict>
   include <abstractions/nameservice-strict>
   include <abstractions/devices-usb>
 
@@ -25,7 +25,7 @@ profile chpst @{exec_pathCHP} {
 
   signal (receive)  peer=runsv,
 
-  @{exec_pathCHP} 	mr,
+  @{exec_path} 	mr,
 
   @{bin}/agetty		rPx,
   @{bin}/pause 		rPx,
